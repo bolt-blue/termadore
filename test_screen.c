@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     while (1) {
         // NOTE: This is where real work would be done, prior to rendering
-        draw();
+        render();
 
         if (!kbhit())
             continue;

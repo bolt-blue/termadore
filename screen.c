@@ -11,16 +11,15 @@
 
 /* ========================================================================== */
 
-// TODO: Rename to 'pixel'
-typedef union unichar {
+typedef union pixel {
     uint64_t i;
     char code[8];
-} unichar;
+} pixel;
 
 struct Screen {
     unsigned short w;
     unsigned short h;
-    unichar *buffer;
+    pixel *buffer;
 } g_screen;
 
 enum Colour {
@@ -121,8 +120,7 @@ void cleanup()
     showcur();
 }
 
-// TODO: Rename to 'render'
-void draw(void)
+void render(void)
 {
     gotoxy(0, 0);
 
