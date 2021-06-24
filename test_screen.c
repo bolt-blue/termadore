@@ -7,7 +7,17 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    fill(MID);
+    // Solid fill
+    //fill(MID);
+
+    // Stripes
+    int width = getwidth();
+    int height = getheight();
+    enum Colour line_colour = MID;
+    for (int i = 0; i < height; i++) {
+        draw_line(0, i, width, line_colour);
+        line_colour = line_colour == MID ? LGT : MID;
+    }
 
     char key;
     while (1) {
