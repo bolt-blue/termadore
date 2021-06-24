@@ -2,6 +2,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <time.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,7 @@
 
 /* ========================================================================== */
 
+// TODO: Rename to 'pixel'
 typedef union unichar {
     uint64_t i;
     char code[8];
@@ -28,6 +30,12 @@ enum Colour {
     LGT = 0x9196e2009196e200,
     CLR = 0x2000000020000000
 };
+
+// TODO: Store these in a struct?
+static struct timespec g_current_time;
+static struct timespec g_last_time;
+static int g_max_fps;
+static float g_dt;
 
 #define NB_ENABLE 1
 #define NB_DISABLE 2
@@ -98,6 +106,10 @@ int init_screen(void)
     stdinblock(NB_ENABLE);
     hidecur();
 
+    clock_gettime(CLOCK_MONOTONIC, &g_last_time);
+    // TODO: Allow to be set by caller
+    g_max_fps = 30;
+
     return 0;
 }
 
@@ -109,6 +121,7 @@ void cleanup()
     showcur();
 }
 
+// TODO: Rename to 'render'
 void draw(void)
 {
     gotoxy(0, 0);
@@ -119,10 +132,31 @@ void draw(void)
         gotoxy(0, i);
     }
 
-    // NOTE: The following was first attempt to avoid mixing use of FILE * and file descriptors.
-    // But it does not overwrite the screen as the above does.
-    // TODO: Find a way to do the above but with filedes
-    //write(STDOUT_FILENO, g_screen.buffer, g_screen.w * g_screen.h * sizeof(unichar));
+    // TODO: Do we really want this?
+    fflush(stdout);
+
+    clock_gettime(CLOCK_MONOTONIC, &g_current_time);
+
+    const long int nspf = 1e9 / g_max_fps;
+    struct timespec rqtp;
+    rqtp.tv_sec = 0;
+
+    g_dt = (g_current_time.tv_sec + 1e-9 * g_current_time.tv_nsec)
+                - (g_last_time.tv_sec + 1e-9 * g_last_time.tv_nsec);
+
+    // NOTE: [Debug]
+    fprintf(stderr, "Last: %ld:%-12ld | Current: %ld:%-12ld | dt: %.9f",
+            g_last_time.tv_sec, g_last_time.tv_nsec,
+            g_current_time.tv_sec, g_current_time.tv_nsec,
+            g_dt);
+
+    g_last_time = g_current_time;
+
+    // Limit framerate if necessary
+    rqtp.tv_nsec = nspf - g_dt * 1e9;
+    // NOTE: [Debug]
+    fprintf(stderr, " | Sleeping for: %-9ld nanoseconds\n", rqtp.tv_nsec);
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
 
 void fill(enum Colour c)
@@ -148,4 +182,8 @@ int getwidth()
 int getheight()
 {
     return g_screen.h;
+}
+float get_dt()
+{
+    return g_dt;
 }
