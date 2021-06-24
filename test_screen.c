@@ -21,12 +21,14 @@ int main(int argc, char **argv)
 
     char key;
     while (1) {
-        if (kbhit()) {
-            key = fgetc(stdin);
-            if (key == 'q')
-                break;
-        }
         draw();
+
+        if (!kbhit())
+            continue;
+
+        key = fgetc(stdin);
+        if (key == 'q')
+            break;
     }
 
     cleanup();
