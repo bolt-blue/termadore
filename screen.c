@@ -122,3 +122,20 @@ void fill(enum Colour c)
         memcpy(cur++, &c, sizeof(unichar));
     }
 }
+
+void draw_line(int x, int y, int len, enum Colour c)
+{
+    unichar *cur = g_screen.buffer + y * g_screen.w + x;
+    for (size_t i = 0; i < len; i++) {
+        memcpy(cur++, &c, sizeof(unichar));
+    }
+}
+
+int getwidth()
+{
+    return g_screen.w;
+}
+int getheight()
+{
+    return g_screen.h;
+}
