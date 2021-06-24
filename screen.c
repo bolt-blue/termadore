@@ -175,7 +175,12 @@ void draw_line(int x, int y, int len, enum Shade px_type)
 
 void set_pixel(int x, int y, enum Shade px_type)
 {
-    memcpy(g_screen.buffer + y * g_screen.w + x, &px_type, sizeof(pixel));
+    pixel *pos = g_screen.buffer + y * g_screen.w + x;
+
+    if (pos < g_screen.buffer || pos >= g_screen.buffer + g_screen.w * g_screen.h)
+        return;
+
+    memcpy(pos, &px_type, sizeof(pixel));
 }
 
 int get_width()
