@@ -22,7 +22,7 @@ struct Screen {
     pixel *buffer;
 } g_screen;
 
-enum Colour {
+enum Shade {
     BLK = 0x8896e2008896e200,
     DRK = 0x9396e2009396e200,
     MID = 0x9296e2009296e200,
@@ -94,7 +94,7 @@ int init_screen(void)
     unsigned short buf_w = w.ws_col / 2;
     unsigned short buf_h = w.ws_row;
 
-    g_screen.buffer = calloc(buf_h, buf_w * sizeof(unichar));
+    g_screen.buffer = calloc(buf_h, buf_w * sizeof(pixel));
     if (!g_screen.buffer)
         return 1;
 
@@ -124,9 +124,9 @@ void render(void)
 {
     gotoxy(0, 0);
 
-    unichar *cur = g_screen.buffer;
+    pixel *cur = g_screen.buffer;
     for (int i = 0; i < g_screen.h; i++, cur += g_screen.w) {
-        fwrite(cur, g_screen.w * sizeof(unichar), 1, stdout);
+        fwrite(cur, g_screen.w * sizeof(pixel), 1, stdout);
         gotoxy(0, i);
     }
 
@@ -157,19 +157,19 @@ void render(void)
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
 
-void fill(enum Colour c)
+void fill(enum Shade c)
 {
-    unichar *cur = g_screen.buffer;
+    pixel *cur = g_screen.buffer;
     for (size_t i = 0; i < g_screen.w * g_screen.h; i++) {
-        memcpy(cur++, &c, sizeof(unichar));
+        memcpy(cur++, &c, sizeof(pixel));
     }
 }
 
-void draw_line(int x, int y, int len, enum Colour c)
+void draw_line(int x, int y, int len, enum Shade c)
 {
-    unichar *cur = g_screen.buffer + y * g_screen.w + x;
+    pixel *cur = g_screen.buffer + y * g_screen.w + x;
     for (size_t i = 0; i < len; i++) {
-        memcpy(cur++, &c, sizeof(unichar));
+        memcpy(cur++, &c, sizeof(pixel));
     }
 }
 

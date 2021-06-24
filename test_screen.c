@@ -13,10 +13,10 @@ int main(int argc, char **argv)
     // Stripes
     int width = get_width();
     int height = get_height();
-    enum Colour line_colour = MID;
+    enum Shade line_shade = MID;
     for (int i = 0; i < height; i++) {
-        draw_line(0, i, width, line_colour);
-        line_colour = line_colour == MID ? LGT : MID;
+        draw_line(0, i, width, line_shade);
+        line_shade = line_shade == MID ? LGT : MID;
     }
 
     while (1) {
