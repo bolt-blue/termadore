@@ -31,8 +31,11 @@ enum Colour {
 
 #define NB_ENABLE 1
 #define NB_DISABLE 2
+#define reset() printf("\033[2J")
 #define clear() printf("\033[H\033[J")
 #define gotoxy(x,y) printf("\033[%d;%dH", (y), (x))
+#define hidecur() printf("\033[?25l");
+#define showcur() printf("\033[?25h");
 
 /* ========================================================================== */
 
@@ -89,6 +92,7 @@ int init_screen(void)
     g_screen.h = w.ws_row;
 
     stdinblock(NB_ENABLE);
+    hidecur();
 
     return 0;
 }
@@ -98,12 +102,17 @@ void cleanup()
     free(g_screen.buffer);
     clear();
     stdinblock(NB_DISABLE);
+    showcur();
 }
 
 void draw(void)
 {
     gotoxy(0, 0);
     fwrite(g_screen.buffer, g_screen.w * sizeof(unichar), g_screen.h, stdout);
+    // NOTE: The following was first attempt to avoid mixing use of FILE * and file descriptors.
+    // But it does not overwrite the screen as the above does.
+    // TODO: Find a way to do the above but with filedes
+    //write(STDOUT_FILENO, g_screen.buffer, g_screen.w * g_screen.h * sizeof(unichar));
 }
 
 void fill(enum Colour c)
