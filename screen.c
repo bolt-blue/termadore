@@ -175,11 +175,11 @@ void draw_line(int x, int y, int len, enum Colour c)
     }
 }
 
-int getwidth()
+int get_width()
 {
     return g_screen.w;
 }
-int getheight()
+int get_height()
 {
     return g_screen.h;
 }

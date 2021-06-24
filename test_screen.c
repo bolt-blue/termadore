@@ -11,22 +11,22 @@ int main(int argc, char **argv)
     //fill(MID);
 
     // Stripes
-    int width = getwidth();
-    int height = getheight();
+    int width = get_width();
+    int height = get_height();
     enum Colour line_colour = MID;
     for (int i = 0; i < height; i++) {
         draw_line(0, i, width, line_colour);
         line_colour = line_colour == MID ? LGT : MID;
     }
 
-    char key;
     while (1) {
+        // NOTE: This is where real work would be done, prior to rendering
         draw();
 
         if (!kbhit())
             continue;
 
-        key = fgetc(stdin);
+        char key = fgetc(stdin);
         if (key == 'q')
             break;
     }
