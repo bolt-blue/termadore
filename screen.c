@@ -102,9 +102,9 @@ int kbhit()
     FD_ZERO(&rfds);
     FD_SET(STDIN_FILENO, &rfds);
 
-    // Poll about 120 times per second
+    // Poll immediately
     tv.tv_sec = 0;
-    tv.tv_usec = 8192;
+    tv.tv_usec = 0;
 
     if (select(STDOUT_FILENO, &rfds, NULL, NULL, &tv) == -1)
         perror("select()");
