@@ -11,8 +11,8 @@
 /* ========================================================================== */
 
 typedef union unichar {
-    uint32_t i;
-    char code[4];
+    uint64_t i;
+    char code[8];
 } unichar;
 
 struct Screen {
@@ -22,11 +22,11 @@ struct Screen {
 } g_screen;
 
 enum Colour {
-    BLK = 0x8896e200,
-    DRK = 0x9396e200,
-    MID = 0x9296e200,
-    LGT = 0x9196e200,
-    CLR = 0x20000000
+    BLK = 0x8896e2008896e200,
+    DRK = 0x9396e2009396e200,
+    MID = 0x9296e2009296e200,
+    LGT = 0x9196e2009196e200,
+    CLR = 0x2000000020000000
 };
 
 #define NB_ENABLE 1
@@ -84,12 +84,16 @@ int init_screen(void)
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
-    g_screen.buffer = calloc(w.ws_row, w.ws_col * sizeof(unichar));
+    unsigned short buf_w = w.ws_col / 2;
+    unsigned short buf_h = w.ws_row;
+
+    g_screen.buffer = calloc(buf_h, buf_w * sizeof(unichar));
     if (!g_screen.buffer)
         return 1;
 
-    g_screen.w = w.ws_col;
-    g_screen.h = w.ws_row;
+    // Terminal width is halved so we can have more square "pixels"
+    g_screen.w = buf_w;
+    g_screen.h = buf_h;
 
     stdinblock(NB_ENABLE);
     hidecur();
@@ -108,7 +112,13 @@ void cleanup()
 void draw(void)
 {
     gotoxy(0, 0);
-    fwrite(g_screen.buffer, g_screen.w * sizeof(unichar), g_screen.h, stdout);
+
+    unichar *cur = g_screen.buffer;
+    for (int i = 0; i < g_screen.h; i++, cur += g_screen.w) {
+        fwrite(cur, g_screen.w * sizeof(unichar), 1, stdout);
+        gotoxy(0, i);
+    }
+
     // NOTE: The following was first attempt to avoid mixing use of FILE * and file descriptors.
     // But it does not overwrite the screen as the above does.
     // TODO: Find a way to do the above but with filedes
