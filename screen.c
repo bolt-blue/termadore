@@ -157,19 +157,19 @@ void render(void)
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
 
-void fill(enum Shade c)
+void fill(enum Shade px_type)
 {
     pixel *cur = g_screen.buffer;
     for (size_t i = 0; i < g_screen.w * g_screen.h; i++) {
-        memcpy(cur++, &c, sizeof(pixel));
+        memcpy(cur++, &px_type, sizeof(pixel));
     }
 }
 
-void draw_line(int x, int y, int len, enum Shade c)
+void draw_line(int x, int y, int len, enum Shade px_type)
 {
     pixel *cur = g_screen.buffer + y * g_screen.w + x;
     for (size_t i = 0; i < len; i++) {
-        memcpy(cur++, &c, sizeof(pixel));
+        memcpy(cur++, &px_type, sizeof(pixel));
     }
 }
 
