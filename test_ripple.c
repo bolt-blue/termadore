@@ -32,7 +32,7 @@ void update()
 
     static float acc = 0;
 
-    for (int i = 3; i < 24; i += 3) {
+    for (int i = 3; i < x_center; i += 3) {
         int r = i * sin(acc * (PI / 180));
 
         int x = 0, y = r;
