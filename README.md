@@ -8,3 +8,13 @@ along with some basic drawing tools.
 What will you come up with?
 
 Plus who doesn't love a bad play on words - we adore the terminal and the commodore.
+
+
+## Usage
+
+Currently in alpha testing.
+
+```
+make
+./test_ripple
+```
