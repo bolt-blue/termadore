@@ -56,6 +56,26 @@ void stdinblock(int state)
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
 }
 
+int kbhit()
+{
+    fd_set rfds;
+    struct timeval tv;
+
+    FD_ZERO(&rfds);
+    FD_SET(STDIN_FILENO, &rfds);
+
+    // Poll immediately
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
+    if (select(STDOUT_FILENO, &rfds, NULL, NULL, &tv) == -1)
+        perror("select()");
+
+    return FD_ISSET(STDIN_FILENO, &rfds);
+}
+
+/* ========================================================================== */
+
 int init_screen(void)
 {
     struct winsize w;
@@ -92,22 +112,4 @@ void fill(enum Colour c)
     for (size_t i = 0; i < g_screen.w * g_screen.h; i++) {
         memcpy(cur++, &c, sizeof(unichar));
     }
-}
-
-int kbhit()
-{
-    fd_set rfds;
-    struct timeval tv;
-
-    FD_ZERO(&rfds);
-    FD_SET(STDIN_FILENO, &rfds);
-
-    // Poll immediately
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-
-    if (select(STDOUT_FILENO, &rfds, NULL, NULL, &tv) == -1)
-        perror("select()");
-
-    return FD_ISSET(STDIN_FILENO, &rfds);
 }
