@@ -22,11 +22,11 @@ static float g_dt;
 
 #define NB_ENABLE 1
 #define NB_DISABLE 2
-#define reset() printf("\033[2J")
-#define clear() printf("\033[H\033[J")
-#define gotoxy(x,y) printf("\033[%d;%dH", (y), (x))
-#define hidecur() printf("\033[?25l");
-#define showcur() printf("\033[?25h");
+#define reset() fputs("\033[2J", stdout)
+#define clear() fputs("\033[H\033[J", stdout)
+#define hidecur() fputs("\033[?25l", stdout)
+#define showcur() fputs("\033[?25h", stdout)
+#define gotoxy(x,y) fprintf(stdout, "\033[%d;%dH", (y), (x))
 
 /* ========================================================================== */
 
