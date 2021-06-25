@@ -8,7 +8,7 @@ LDLIBS := -lm
 OBJ := screen.o
 
 .PHONY: all
-all: $(OBJ) test
+all: $(OBJ) demo
 
 .PHONY: $(basename $(OBJ))
 $(basename $(OBJ)): $(OBJ)
@@ -16,13 +16,13 @@ $(basename $(OBJ)): $(OBJ)
 $(OBJ): %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-TESTS = test_screen test_ripple
-test: $(TESTS)
+DEMOS = demo_screen demo_ripple
+demo: $(DEMOS)
 
-$(TESTS): $(OBJ) $(addsuffix .c, $(TESTS))
+$(DEMOS): $(OBJ) $(addsuffix .c, $(DEMOS))
 	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@ $(LDLIBS)
 
 .PHONY: clean
 clean:
-	rm -f $(TESTS)
+	rm -f $(DEMOS)
 	rm -f $(OBJ)

@@ -33,7 +33,7 @@ Simply run `make` to build all targets, or `make screen` if you just want the sc
 
 ## Usage
 
-The tests provide a reasonable example of usage.  
+The demos provide a reasonable example of usage.  
 
 ### General Approach
 
@@ -68,7 +68,7 @@ The tests provide a reasonable example of usage.
 
 ## Todo
 
+- Write proper tests
 - Update "screen" on terminal resize
 - Add colours
 - Allow user to set max FPS
-
