@@ -123,22 +123,14 @@ void cleanup(void)
 
 void render(void)
 {
-    pixel *cur = g_screen.buffer;
-    for (int i = 0; i < g_screen.h; i++, cur += g_screen.w) {
-        // TODO: Investigate this off-by-one issue
-        gotoxy(0, i + 1);
-        fwrite(cur, g_screen.w * sizeof(pixel), 1, stdout);
-    }
-
-    // TODO: Do we really want this?
-    fflush(stdout);
-
     clock_gettime(CLOCK_MONOTONIC, &g_current_time);
 
     const long int nspf = 1e9 / g_max_fps;
     struct timespec rqtp;
     rqtp.tv_sec = 0;
 
+    // TODO: Determine if our general approach to measuring delta time
+    // and throttling frame rate is suitable
     g_dt = (g_current_time.tv_sec + 1e-9 * g_current_time.tv_nsec)
                 - (g_last_time.tv_sec + 1e-9 * g_last_time.tv_nsec);
 
@@ -152,14 +144,22 @@ void render(void)
     // Limit framerate if necessary
     rqtp.tv_nsec = nspf - g_dt * 1e9;
     DEBUG_PRINT(0, g_screen.h - 1, "Sleeping for: %-9ld nanoseconds", rqtp.tv_nsec);
+
+    pixel *cur = g_screen.buffer;
+    for (int i = 0; i < g_screen.h; i++, cur += g_screen.w) {
+        // TODO: Investigate this off-by-one issue
+        gotoxy(0, i + 1);
+        fwrite(cur, g_screen.w * sizeof(pixel), 1, stdout);
+    }
+
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
 
 void fill(enum Shade px_type)
 {
     pixel *cur = g_screen.buffer;
-    for (size_t i = 0; i < g_screen.w * g_screen.h; i++) {
-        memcpy(cur++, &px_type, sizeof(pixel));
+    while (cur++ < g_screen.end) {
+        memcpy(cur, &px_type, sizeof(pixel));
     }
 }
 
