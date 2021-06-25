@@ -12,9 +12,12 @@ typedef union pixel {
 struct Screen {
     unsigned short w;
     unsigned short h;
+    pixel *pen;
     pixel *buffer;
+    pixel *end;
 };
 
+// TODO: Respect endian-ness
 enum Shade {
     BLK = 0x8896e2008896e200,
     DRK = 0x9396e2009396e200,
@@ -29,7 +32,9 @@ void cleanup();
 void render();
 void fill(enum Shade);
 void draw_line(int, int, int, enum Shade);
-void set_pixel(int, int, enum Shade);
+void set_pixel_at_pen(enum Shade);
+void set_pixel_xy(int, int, enum Shade);
+void set_pen(int, int);
 int get_width();
 int get_height();
 float get_dt();

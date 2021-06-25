@@ -90,6 +90,8 @@ int init_screen(void)
     // Terminal width is halved so we can have more square "pixels"
     g_screen.w = buf_w;
     g_screen.h = buf_h;
+    g_screen.pen = g_screen.buffer;
+    g_screen.end = g_screen.buffer + buf_w * buf_h;
 
     stdinblock(NB_ENABLE);
     hidecur();
@@ -106,17 +108,17 @@ void cleanup(void)
     free(g_screen.buffer);
     clear();
     stdinblock(NB_DISABLE);
+    // TODO: Make sure cursor was originally visible before setting it on
     showcur();
 }
 
 void render(void)
 {
-    gotoxy(0, 0);
-
     pixel *cur = g_screen.buffer;
     for (int i = 0; i < g_screen.h; i++, cur += g_screen.w) {
+        // TODO: Investigate this off-by-one issue
+        gotoxy(0, i + 1);
         fwrite(cur, g_screen.w * sizeof(pixel), 1, stdout);
-        gotoxy(0, i);
     }
 
     // TODO: Do we really want this?
@@ -132,6 +134,7 @@ void render(void)
                 - (g_last_time.tv_sec + 1e-9 * g_last_time.tv_nsec);
 
     // NOTE: [Debug]
+    gotoxy(0, g_screen.h);
     fprintf(stderr, "Last: %ld:%-12ld | Current: %ld:%-12ld | dt: %.9f",
             g_last_time.tv_sec, g_last_time.tv_nsec,
             g_current_time.tv_sec, g_current_time.tv_nsec,
@@ -160,9 +163,16 @@ void draw_line(int x, int y, int len, enum Shade px_type)
     for (size_t i = 0; i < len; i++) {
         memcpy(cur++, &px_type, sizeof(pixel));
     }
+    g_screen.pen = cur;
 }
 
-void set_pixel(int x, int y, enum Shade px_type)
+void set_pixel_at_pen(enum Shade px_type)
+{
+    memcpy(g_screen.pen++, &px_type, sizeof(pixel));
+    if (g_screen.pen >= g_screen.end)
+        g_screen.pen = g_screen.buffer;
+}
+void set_pixel_xy(int x, int y, enum Shade px_type)
 {
     pixel *pos = g_screen.buffer + y * g_screen.w + x;
 
@@ -170,6 +180,11 @@ void set_pixel(int x, int y, enum Shade px_type)
         return;
 
     memcpy(pos, &px_type, sizeof(pixel));
+}
+
+void set_pen(int x, int y)
+{
+    g_screen.pen = g_screen.buffer + y * g_screen.w + x;
 }
 
 int get_width()

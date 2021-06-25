@@ -21,6 +21,19 @@ int main(int argc, char **argv)
         line_shade = line_shade == MID ? LGT : MID;
     }
 
+    set_pen(get_width() - 3, get_height() - 1);
+    set_pixel_at_pen(DRK);
+    set_pixel_at_pen(LGT);
+    set_pixel_at_pen(DRK);
+    set_pixel_at_pen(LGT);
+    set_pixel_at_pen(DRK);
+    set_pixel_at_pen(LGT);
+
+    set_pen(0,0);
+    set_pixel_at_pen(CLR);
+    set_pen(get_width() - 1, get_height() - 1);
+    set_pixel_at_pen(CLR);
+
     while (1) {
         // NOTE: This is where real work would be done, prior to rendering
         render();
