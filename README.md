@@ -63,7 +63,7 @@ The tests provide a reasonable example of usage.
   - Fill the entire buffer with a specific shade
 - `void draw_line(x, y, len, shade)`
   - _Currently only horizontal_
-- `void set_pixel(x, y, shade)
+- `void set_pixel(x, y, shade)`
 
 
 ## Todo
