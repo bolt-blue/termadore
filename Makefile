@@ -1,17 +1,28 @@
-BUILD="DEBUG"
+BUILD ?= debug
 
-CFLAGS_DEBUG = -g -O0
-CFLAGS = $(CFLAGS_DEBUG) -Wall
+CFLAGS_debug = -g -O0
+CFLAGS_release = -O3 -DNDEBUG
+CFLAGS := $(CFLAGS_$(BUILD)) -Wall
+LDLIBS := -lm
+
+OBJ := screen.o
 
 .PHONY: all
-all: test
+all: $(OBJ) test
 
-TESTS = test_screen.test test_ripple.test
+.PHONY: $(basename $(OBJ))
+$(basename $(OBJ)): $(OBJ)
+
+$(OBJ): %.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+TESTS = test_screen test_ripple
 test: $(TESTS)
 
-%.test: %.c
-	$(CC) $(CFLAGS) $< -o $* -lm
+$(TESTS): $(OBJ) $(addsuffix .c, $(TESTS))
+	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@ $(LDLIBS)
 
 .PHONY: clean
 clean:
-	rm $(TESTS)
+	rm -f $(TESTS)
+	rm -f $(OBJ)

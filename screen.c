@@ -1,3 +1,5 @@
+#include "screen.h"
+
 #include <sys/select.h>
 #include <sys/ioctl.h>
 #include <termios.h>
@@ -6,29 +8,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <stdio.h>
 
 /* ========================================================================== */
 
-typedef union pixel {
-    uint64_t i;
-    char code[8];
-} pixel;
-
-struct Screen {
-    unsigned short w;
-    unsigned short h;
-    pixel *buffer;
-} g_screen;
-
-enum Shade {
-    BLK = 0x8896e2008896e200,
-    DRK = 0x9396e2009396e200,
-    MID = 0x9296e2009296e200,
-    LGT = 0x9196e2009196e200,
-    CLR = 0x2000000020000000
-};
+static struct Screen g_screen;
 
 // TODO: Store these in a struct?
 static struct timespec g_current_time;
@@ -46,7 +30,7 @@ static float g_dt;
 
 /* ========================================================================== */
 
-void stdinblock(int state)
+static void stdinblock(int state)
 {
     struct termios ttystate;
 
@@ -66,7 +50,7 @@ void stdinblock(int state)
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
 }
 
-int kbhit()
+int kbhit(void)
 {
     fd_set rfds;
     struct timeval tv;
@@ -85,6 +69,11 @@ int kbhit()
 }
 
 /* ========================================================================== */
+
+/*
+ * TODO:
+ * - Update screen if terminal gets resized
+ */
 
 int init_screen(void)
 {
@@ -112,7 +101,7 @@ int init_screen(void)
     return 0;
 }
 
-void cleanup()
+void cleanup(void)
 {
     free(g_screen.buffer);
     clear();

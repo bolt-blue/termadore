@@ -1,4 +1,6 @@
-#include "screen.c"
+#include <stdio.h>
+
+#include "screen.h"
 
 int main(int argc, char **argv)
 {

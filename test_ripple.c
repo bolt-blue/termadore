@@ -1,6 +1,7 @@
-#include "screen.c"
+#include "screen.h"
 
 #include <math.h>
+#include <stdio.h>
 
 #define PI 3.14159265f
 
@@ -27,8 +28,8 @@ void update()
 
     enum Shade shade = MID;
 
-    const int x_center = g_screen.w / 2;
-    const int y_center = g_screen.h / 2;
+    const int x_center = get_width() / 2;
+    const int y_center = get_height() / 2;
 
     static float acc = 0;
 
