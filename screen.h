@@ -35,6 +35,7 @@ void draw_line(int, int, int, enum Shade);
 void set_pixel_at_pen(enum Shade);
 void set_pixel_xy(int, int, enum Shade);
 void set_pen(int, int);
+void write_string(char *, int, int, int);
 int get_width();
 int get_height();
 float get_dt();

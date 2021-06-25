@@ -28,6 +28,15 @@ static float g_dt;
 #define showcur() fputs("\033[?25h", stdout)
 #define gotoxy(x,y) fprintf(stdout, "\033[%d;%dH", (y), (x))
 
+#ifndef NDEBUG
+char g_scratch[512];
+#define DEBUG_PRINT(dbgx, dbgy, ...) \
+    snprintf(g_scratch, 511, __VA_ARGS__); \
+    write_string(g_scratch, strlen(g_scratch), (dbgx), (dbgy))
+#else
+#define DEBUG_PRINT(...)
+#endif
+
 /* ========================================================================== */
 
 static void stdinblock(int state)
@@ -134,18 +143,17 @@ void render(void)
                 - (g_last_time.tv_sec + 1e-9 * g_last_time.tv_nsec);
 
     // NOTE: [Debug]
-    gotoxy(0, g_screen.h);
-    fprintf(stderr, "Last: %ld:%-12ld | Current: %ld:%-12ld | dt: %.9f",
-            g_last_time.tv_sec, g_last_time.tv_nsec,
-            g_current_time.tv_sec, g_current_time.tv_nsec,
-            g_dt);
+    DEBUG_PRINT(0, g_screen.h - 2, "Last: %ld:%-12ld | Current: %ld:%-12ld | dt: %.9f",
+                g_last_time.tv_sec, g_last_time.tv_nsec,
+                g_current_time.tv_sec, g_current_time.tv_nsec,
+                g_dt);
 
     g_last_time = g_current_time;
 
     // Limit framerate if necessary
     rqtp.tv_nsec = nspf - g_dt * 1e9;
     // NOTE: [Debug]
-    fprintf(stderr, " | Sleeping for: %-9ld nanoseconds\n", rqtp.tv_nsec);
+    DEBUG_PRINT(0, g_screen.h - 1, "Sleeping for: %-9ld nanoseconds", rqtp.tv_nsec);
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
 
@@ -185,6 +193,15 @@ void set_pixel_xy(int x, int y, enum Shade px_type)
 void set_pen(int x, int y)
 {
     g_screen.pen = g_screen.buffer + y * g_screen.w + x;
+}
+
+void write_string(char *str, int len, int x, int y)
+{
+    pixel *cur = g_screen.buffer + y * g_screen.w + x;
+    memset(cur, 0, len * sizeof(pixel));
+    for (int i = 0; i < len; i++) {
+        memcpy(cur++, str++, 1);
+    }
 }
 
 int get_width()
