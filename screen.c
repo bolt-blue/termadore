@@ -142,7 +142,6 @@ void render(void)
     g_dt = (g_current_time.tv_sec + 1e-9 * g_current_time.tv_nsec)
                 - (g_last_time.tv_sec + 1e-9 * g_last_time.tv_nsec);
 
-    // NOTE: [Debug]
     DEBUG_PRINT(0, g_screen.h - 2, "Last: %ld:%-12ld | Current: %ld:%-12ld | dt: %.9f",
                 g_last_time.tv_sec, g_last_time.tv_nsec,
                 g_current_time.tv_sec, g_current_time.tv_nsec,
@@ -152,7 +151,6 @@ void render(void)
 
     // Limit framerate if necessary
     rqtp.tv_nsec = nspf - g_dt * 1e9;
-    // NOTE: [Debug]
     DEBUG_PRINT(0, g_screen.h - 1, "Sleeping for: %-9ld nanoseconds", rqtp.tv_nsec);
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
@@ -197,10 +195,12 @@ void set_pen(int x, int y)
 
 void write_string(char *str, int len, int x, int y)
 {
-    pixel *cur = g_screen.buffer + y * g_screen.w + x;
-    memset(cur, 0, len * sizeof(pixel));
+    // TODO: Find a nicer approach to this black magic
+    char *cur = (char *)(g_screen.buffer + y * g_screen.w + x);
+    memset(cur, 0, len * sizeof(pixel) / 2);
     for (int i = 0; i < len; i++) {
-        memcpy(cur++, str++, 1);
+        memcpy(cur, str++, 1);
+        cur += sizeof(pixel) / 2;
     }
 }
 
