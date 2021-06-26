@@ -1,10 +1,12 @@
 #include "screen.h"
 
 #include <math.h>
+//#include <string.h>
 #include <stdio.h>
 
 #define PI 3.14159265f
 
+// TODO: Give this function a more clear name
 void draw_circle(int x_center, int y_center, int x, int y, enum Shade shade)
 {
     set_pixel_xy(x + x_center, y + y_center, shade);
@@ -17,24 +19,47 @@ void draw_circle(int x_center, int y_center, int x, int y, enum Shade shade)
     set_pixel_xy(-y + x_center, -x + y_center, shade);
 }
 
+struct ring {
+    int rad;
+    enum Shade shd;
+};
 /*
  * Using Bresenham’s algorithm to draw circles.
  */
-void update()
+void update(struct ring *rings, int sz)
 {
     // TODO:
-    // - Convert to ripple effect
     // - Add colour
 
-    enum Shade shade = MID;
+    static float acc = 0;
+    int move = 0;
+
+    acc += 100 * get_dt();
+    if (acc > 20) {
+        acc = 0;
+        move = 1;
+    }
+
+#define PSZ 4
+    static enum Shade pattern[PSZ] = {DRK, MID, LGT, MID};
+    if (move) {
+        enum Shade tmp = pattern[PSZ - 1];
+        for (int i = PSZ - 1; i > 0; i--) {
+            pattern[i] = pattern[i - 1];
+        }
+        pattern[0] = tmp;
+    }
 
     const int x_center = get_width() / 2;
     const int y_center = get_height() / 2;
 
-    static float acc = 0;
+    for (int i = 0; i < sz; i++) {
+        int r = rings[i].rad;// * sin(acc * (PI / 180));
+        enum Shade shade = rings[i].shd;
 
-    for (int i = 3; i < x_center; i += 3) {
-        int r = i * sin(acc * (PI / 180));
+        if (move) {
+            rings[i].shd = pattern[i % 4];
+        }
 
         int x = 0, y = r;
         int d = PI - 2 * r;
@@ -54,9 +79,9 @@ void update()
         }
     }
 
-    acc += 100 * get_dt();
-    if (acc >= 360) acc = 0;
-    //fprintf(stderr, "[%.6f] ", acc);
+    //char scratch[16] = {0};
+    //sprintf(scratch, "[%.6f] ", acc);
+    //write_string(scratch, strlen(scratch), 0, 1);
 }
 
 int main(int argc, char **argv)
@@ -66,9 +91,25 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    int w = get_width();
+    int h = get_height();
+
+    int biggest = (sqrt(w * w + h * h) + 0.5) / 2;
+    int ring_count = biggest - 3;
+    struct ring rings[ring_count];
+    for (int i = 0; i < ring_count; i++) {
+        rings[i].rad = i + 2;
+        switch (i % 4) {
+            case 0: rings[i].shd = DRK; break;
+            case 1: rings[i].shd = MID; break;
+            case 2: rings[i].shd = LGT; break;
+            case 3: rings[i].shd = MID; break;
+        }
+    }
+
     while (1) {
         fill(CLR);
-        update();
+        update(rings, ring_count);
         render();
 
         if (!kbhit())
