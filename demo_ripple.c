@@ -19,6 +19,7 @@ void draw_circle(int x_center, int y_center, int x, int y, enum Shade shade)
     set_pixel_xy(-y + x_center, -x + y_center, shade);
 }
 
+#define PSZ 8
 struct ring {
     int rad;
     enum Shade shd;
@@ -35,13 +36,12 @@ void update(struct ring *rings, int sz)
     int move = 0;
 
     acc += 100 * get_dt();
-    if (acc > 20) {
+    if (acc > 12) {
         acc = 0;
         move = 1;
     }
 
-#define PSZ 4
-    static enum Shade pattern[PSZ] = {DRK, MID, LGT, MID};
+    static enum Shade pattern[PSZ] = {DRK, MID, CLR, LGT, MID, DRK, BLK, BLK};
     if (move) {
         enum Shade tmp = pattern[PSZ - 1];
         for (int i = PSZ - 1; i > 0; i--) {
@@ -58,7 +58,7 @@ void update(struct ring *rings, int sz)
         enum Shade shade = rings[i].shd;
 
         if (move) {
-            rings[i].shd = pattern[i % 4];
+            rings[i].shd = pattern[i % PSZ];
         }
 
         int x = 0, y = r;
@@ -99,12 +99,7 @@ int main(int argc, char **argv)
     struct ring rings[ring_count];
     for (int i = 0; i < ring_count; i++) {
         rings[i].rad = i + 2;
-        switch (i % 4) {
-            case 0: rings[i].shd = DRK; break;
-            case 1: rings[i].shd = MID; break;
-            case 2: rings[i].shd = LGT; break;
-            case 3: rings[i].shd = MID; break;
-        }
+        rings[i].shd = CLR;
     }
 
     while (1) {
