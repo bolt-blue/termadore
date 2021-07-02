@@ -27,8 +27,11 @@ enum Shade {
 };
 
 int kbhit();
+int init_window(void);
 int init_screen();
+void kill_window(void);
 void cleanup();
+int detect_resize(void);
 void render();
 void fill(enum Shade);
 void draw_line(int, int, int, enum Shade);

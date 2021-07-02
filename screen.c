@@ -81,14 +81,15 @@ int kbhit(void)
 
 /*
  * TODO:
- * - Update screen if terminal gets resized
+ * - Error handling
  */
 
-int init_screen(void)
+int init_window(void)
 {
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
+    // Terminal width is halved so we can have more square "pixels"
     unsigned short buf_w = w.ws_col / 2;
     unsigned short buf_h = w.ws_row;
 
@@ -96,11 +97,17 @@ int init_screen(void)
     if (!g_screen.buffer)
         return 1;
 
-    // Terminal width is halved so we can have more square "pixels"
     g_screen.w = buf_w;
     g_screen.h = buf_h;
     g_screen.pen = g_screen.buffer;
     g_screen.end = g_screen.buffer + buf_w * buf_h;
+
+    return 0;
+}
+
+int init_screen(void)
+{
+    init_window();
 
     stdinblock(NB_ENABLE);
     hidecur();
@@ -112,19 +119,41 @@ int init_screen(void)
     return 0;
 }
 
-void cleanup(void)
+void kill_window(void)
 {
     free(g_screen.buffer);
     clear();
+}
+
+void cleanup(void)
+{
+    kill_window();
     stdinblock(NB_DISABLE);
     // TODO: Make sure cursor was originally visible before setting it on
     showcur();
+}
+
+int detect_resize(void)
+{
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    unsigned short buf_w = w.ws_col / 2;
+    unsigned short buf_h = w.ws_row;
+
+    DEBUG_PRINT(1, 1, "W: %3d | H : %3d", buf_w, buf_h);
+
+    if (buf_w != g_screen.w || buf_h != g_screen.h)
+        return 1;
+
+    return 0;
 }
 
 void render(void)
 {
     clock_gettime(CLOCK_MONOTONIC, &g_current_time);
 
+    // TODO: Avoid continually recalculating this value
     const long int nspf = 1e9 / g_max_fps;
     struct timespec rqtp;
     rqtp.tv_sec = 0;
@@ -181,16 +210,20 @@ void set_pixel_at_pen(enum Shade px_type)
 }
 void set_pixel_xy(int x, int y, enum Shade px_type)
 {
-    pixel *pos = g_screen.buffer + y * g_screen.w + x;
-
-    if (pos < g_screen.buffer || pos >= g_screen.buffer + g_screen.w * g_screen.h)
+    if (x < 0 || y < 0 || x >= g_screen.w || y >= g_screen.h)
         return;
 
+    pixel *pos = g_screen.buffer + y * g_screen.w + x;
     memcpy(pos, &px_type, sizeof(pixel));
 }
 
+/*
+ * Will leave pen untouched if x or y is out of bounds
+ */
 void set_pen(int x, int y)
 {
+    if (x < 0 || y < 0 || x >= g_screen.w || y >= g_screen.h)
+        return;
     g_screen.pen = g_screen.buffer + y * g_screen.w + x;
 }
 
