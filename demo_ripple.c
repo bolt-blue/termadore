@@ -1,5 +1,6 @@
 #include "screen.h"
 
+#include <stdlib.h>
 #include <math.h>
 //#include <string.h>
 #include <stdio.h>
@@ -24,6 +25,43 @@ struct ring {
     int rad;
     enum Shade shd;
 };
+
+#define MIN_RING_RAD 2
+int init_rings(int *count, struct ring **rings)
+{
+    int w = get_width();
+    int h = get_height();
+
+    int biggest = (sqrt(w * w + h * h) + 0.5) / 2;
+    int new_count = biggest - MIN_RING_RAD;
+
+    if (*rings) {
+        // TODO: Copy any existing values
+        // - careful about whether the bounds are shrinking or expanding
+        struct ring *old_rings = *rings;
+        int cpy_count = new_count >= *count ? *count : new_count;
+        *count = new_count;
+        *rings = malloc(*count * sizeof(struct ring));
+        for (int i = 0; i < cpy_count; i++) {
+            (*rings)[i] = old_rings[i];
+        }
+        for (int i = cpy_count; i < *count; i++) {
+            (*rings)[i].rad = i + MIN_RING_RAD;
+            (*rings)[i].shd = CLR;
+        }
+        free(old_rings);
+    } else {
+        *count = new_count;
+        *rings = malloc(*count * sizeof(struct ring));
+        for (int i = 0; i < *count; i++) {
+            (*rings)[i].rad = i + MIN_RING_RAD;
+            (*rings)[i].shd = CLR;
+        }
+    }
+
+    return 0;
+}
+
 /*
  * Using Bresenham’s algorithm to draw circles.
  */
@@ -54,7 +92,7 @@ void update(struct ring *rings, int sz)
     const int y_center = get_height() / 2;
 
     for (int i = 0; i < sz; i++) {
-        int r = rings[i].rad;// * sin(acc * (PI / 180));
+        int r = rings[i].rad;
         enum Shade shade = rings[i].shd;
 
         if (move) {
@@ -91,20 +129,21 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    int w = get_width();
-    int h = get_height();
+    int ring_count = 0;
+    struct ring *rings = NULL;
 
-    int biggest = (sqrt(w * w + h * h) + 0.5) / 2;
-    int ring_count = biggest - 3;
-    struct ring rings[ring_count];
-    for (int i = 0; i < ring_count; i++) {
-        rings[i].rad = i + 2;
-        rings[i].shd = CLR;
-    }
+    init_rings(&ring_count, &rings);
 
     while (1) {
         fill(CLR);
         update(rings, ring_count);
+
+        if (detect_resize()) {
+            kill_window();
+            init_window();
+            init_rings(&ring_count, &rings);
+        }
+
         render();
 
         if (!kbhit())
