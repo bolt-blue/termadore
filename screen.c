@@ -158,8 +158,9 @@ void render(void)
 void fill(enum Shade px_type)
 {
     pixel *cur = g_screen.buffer;
-    while (cur++ < g_screen.end) {
+    while (cur < g_screen.end) {
         memcpy(cur, &px_type, sizeof(pixel));
+        cur++;
     }
 }
 
