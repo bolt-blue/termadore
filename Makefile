@@ -16,7 +16,7 @@ $(basename $(OBJ)): $(OBJ)
 $(OBJ): %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-DEMOS = demo_basic demo_ripple
+DEMOS = demo_basic demo_ripple demo_torus
 .PHONY: demo
 demo: $(DEMOS)
 
