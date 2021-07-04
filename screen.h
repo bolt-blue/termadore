@@ -4,7 +4,17 @@
 
 #include <stdint.h>
 
+// TODO: Respect endian-ness
+enum Shade {
+    BLK = 0x8896e2008896e200,
+    DRK = 0x9396e2009396e200,
+    MID = 0x9296e2009296e200,
+    LGT = 0x9196e2009196e200,
+    CLR = 0x2000000020000000
+};
+
 typedef union pixel {
+    enum Shade shd;
     uint64_t i;
     char code[8];
 } pixel;
@@ -15,15 +25,6 @@ struct Screen {
     pixel *pen;
     pixel *buffer;
     pixel *end;
-};
-
-// TODO: Respect endian-ness
-enum Shade {
-    BLK = 0x8896e2008896e200,
-    DRK = 0x9396e2009396e200,
-    MID = 0x9296e2009296e200,
-    LGT = 0x9196e2009196e200,
-    CLR = 0x2000000020000000
 };
 
 int kbhit();

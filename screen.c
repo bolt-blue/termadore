@@ -188,23 +188,38 @@ void fill(enum Shade px_type)
 {
     pixel *cur = g_screen.buffer;
     while (cur < g_screen.end) {
-        memcpy(cur, &px_type, sizeof(pixel));
+        cur->shd = px_type;
         cur++;
     }
 }
 
+/*
+ * NOTE: Currently this allows line to overflow on the right
+ * and continue on the next line.
+ * TODO: Better response to error-case(s)
+ */
 void draw_line(int x, int y, int len, enum Shade px_type)
 {
+    if (x < 0 || y < 0 || x >= g_screen.w || y >= g_screen.h)
+        return;
+
     pixel *cur = g_screen.buffer + y * g_screen.w + x;
+
+    if (cur + len >= g_screen.end)
+        return;
+
     for (size_t i = 0; i < len; i++) {
-        memcpy(cur++, &px_type, sizeof(pixel));
+        cur->shd = px_type;
+        cur++;
     }
+
     g_screen.pen = cur;
 }
 
 void set_pixel_at_pen(enum Shade px_type)
 {
-    memcpy(g_screen.pen++, &px_type, sizeof(pixel));
+    g_screen.pen->shd = px_type;
+    g_screen.pen++;
     if (g_screen.pen >= g_screen.end)
         g_screen.pen = g_screen.buffer;
 }
@@ -214,7 +229,7 @@ void set_pixel_xy(int x, int y, enum Shade px_type)
         return;
 
     pixel *pos = g_screen.buffer + y * g_screen.w + x;
-    memcpy(pos, &px_type, sizeof(pixel));
+    pos->shd = px_type;
 }
 
 /*
