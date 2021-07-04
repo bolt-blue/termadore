@@ -8,9 +8,6 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define W 64
-#define H 32
-
 float X,Y,Z,l,t,x,y,z,A,S,C;
 
 // NOTE X and Y here are shadowed
@@ -31,10 +28,9 @@ int main(void)
         return 1;
     }
 
-    int k;
-
     int w = get_width();
     int h = get_height();
+    int k;
 
     enum Shade palette[9] = {BLK, BLK, DRK, DRK, MID, MID, LGT, LGT, CLR};
 
