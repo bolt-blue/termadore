@@ -64,6 +64,9 @@ The demos provide a reasonable example of usage.
 - `void draw_line(x, y, len, shade)`
   - _Currently only horizontal_
 - `void set_pixel(x, y, shade)`
+- `void set_pixel_at_pen(shade)`
+  - Each write also steps the "pen" forward
+- `void set_pen(x, y)`
 
 
 ## Todo

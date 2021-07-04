@@ -10,14 +10,14 @@
 // TODO: Give this function a more clear name
 void draw_circle(int x_center, int y_center, int x, int y, enum Shade shade)
 {
-    set_pixel_xy(x + x_center, y + y_center, shade);
-    set_pixel_xy(-x + x_center, y + y_center, shade);
-    set_pixel_xy(x + x_center, -y + y_center, shade);
-    set_pixel_xy(-x + x_center, -y + y_center, shade);
-    set_pixel_xy(y + x_center, x + y_center, shade);
-    set_pixel_xy(-y + x_center, x + y_center, shade);
-    set_pixel_xy(y + x_center, -x + y_center, shade);
-    set_pixel_xy(-y + x_center, -x + y_center, shade);
+    set_pixel(x + x_center, y + y_center, shade);
+    set_pixel(-x + x_center, y + y_center, shade);
+    set_pixel(x + x_center, -y + y_center, shade);
+    set_pixel(-x + x_center, -y + y_center, shade);
+    set_pixel(y + x_center, x + y_center, shade);
+    set_pixel(-y + x_center, x + y_center, shade);
+    set_pixel(y + x_center, -x + y_center, shade);
+    set_pixel(-y + x_center, -x + y_center, shade);
 }
 
 #define PSZ 8

@@ -216,20 +216,21 @@ void draw_line(int x, int y, int len, enum Shade px_type)
     g_screen.pen = cur;
 }
 
-void set_pixel_at_pen(enum Shade px_type)
-{
-    g_screen.pen->shd = px_type;
-    g_screen.pen++;
-    if (g_screen.pen >= g_screen.end)
-        g_screen.pen = g_screen.buffer;
-}
-void set_pixel_xy(int x, int y, enum Shade px_type)
+void set_pixel(int x, int y, enum Shade px_type)
 {
     if (x < 0 || y < 0 || x >= g_screen.w || y >= g_screen.h)
         return;
 
     pixel *pos = g_screen.buffer + y * g_screen.w + x;
     pos->shd = px_type;
+}
+
+void set_pixel_at_pen(enum Shade px_type)
+{
+    g_screen.pen->shd = px_type;
+    g_screen.pen++;
+    if (g_screen.pen >= g_screen.end)
+        g_screen.pen = g_screen.buffer;
 }
 
 /*
