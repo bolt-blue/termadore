@@ -205,7 +205,7 @@ void draw_line(int x, int y, int len, enum Shade px_type)
 
     pixel *cur = g_screen.buffer + y * g_screen.w + x;
 
-    if (cur + len >= g_screen.end)
+    if (cur + len > g_screen.end)
         return;
 
     for (size_t i = 0; i < len; i++) {
