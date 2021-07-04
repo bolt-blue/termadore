@@ -69,6 +69,5 @@ The demos provide a reasonable example of usage.
 ## Todo
 
 - Write proper tests
-- Update "screen" on terminal resize
 - Add colours
 - Allow user to set max FPS
