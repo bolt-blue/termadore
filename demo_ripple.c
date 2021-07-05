@@ -8,16 +8,16 @@
 #define PI 3.14159265f
 
 // TODO: Give this function a more clear name
-void draw_circle(int x_center, int y_center, int x, int y, enum Shade shade)
+void draw_circle(int x_center, int y_center, int x, int y, enum Shade shade, enum Colour colour)
 {
-    set_pixel(x + x_center, y + y_center, shade);
-    set_pixel(-x + x_center, y + y_center, shade);
-    set_pixel(x + x_center, -y + y_center, shade);
-    set_pixel(-x + x_center, -y + y_center, shade);
-    set_pixel(y + x_center, x + y_center, shade);
-    set_pixel(-y + x_center, x + y_center, shade);
-    set_pixel(y + x_center, -x + y_center, shade);
-    set_pixel(-y + x_center, -x + y_center, shade);
+    set_pixel(x + x_center, y + y_center, shade, colour);
+    set_pixel(-x + x_center, y + y_center, shade, colour);
+    set_pixel(x + x_center, -y + y_center, shade, colour);
+    set_pixel(-x + x_center, -y + y_center, shade, colour);
+    set_pixel(y + x_center, x + y_center, shade, colour);
+    set_pixel(-y + x_center, x + y_center, shade, colour);
+    set_pixel(y + x_center, -x + y_center, shade, colour);
+    set_pixel(-y + x_center, -x + y_center, shade, colour);
 }
 
 #define PSZ 8
@@ -101,7 +101,7 @@ void update(struct ring *rings, int sz)
 
         int x = 0, y = r;
         int d = PI - 2 * r;
-        draw_circle(x_center, y_center, x, y, shade);
+        draw_circle(x_center, y_center, x, y, shade, Blue);
 
         while (y >= x) {
             x++;
@@ -113,7 +113,7 @@ void update(struct ring *rings, int sz)
                 d += 4 * x + 6;
             }
 
-            draw_circle(x_center, y_center, x, y, shade);
+            draw_circle(x_center, y_center, x, y, shade, Blue);
         }
     }
 
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
     init_rings(&ring_count, &rings);
 
     while (1) {
-        fill(CLR);
+        fill(CLR, Unset);
         update(rings, ring_count);
 
         if (detect_resize()) {
