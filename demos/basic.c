@@ -8,24 +8,25 @@ int init_stripes()
     int width = get_width();
     int height = get_height();
     enum Shade line_shade = MID;
+    enum Colour colour = Unset;
 
     for (int i = 0; i < height; i++) {
-        draw_line(0, i, width, line_shade);
+        draw_line(0, i, width, line_shade, colour);
         line_shade = line_shade == MID ? LGT : MID;
     }
 
     set_pen(get_width() - 3, get_height() - 1);
-    set_pixel_at_pen(DRK);
-    set_pixel_at_pen(LGT);
-    set_pixel_at_pen(DRK);
-    set_pixel_at_pen(LGT);
-    set_pixel_at_pen(DRK);
-    set_pixel_at_pen(LGT);
+    set_pixel_at_pen(DRK, colour);
+    set_pixel_at_pen(LGT, colour);
+    set_pixel_at_pen(DRK, colour);
+    set_pixel_at_pen(LGT, colour);
+    set_pixel_at_pen(DRK, colour);
+    set_pixel_at_pen(LGT, colour);
 
     set_pen(0,0);
-    set_pixel_at_pen(CLR);
+    set_pixel_at_pen(CLR, colour);
     set_pen(get_width() - 1, get_height() - 1);
-    set_pixel_at_pen(CLR);
+    set_pixel_at_pen(CLR, colour);
 
     return 0;
 }

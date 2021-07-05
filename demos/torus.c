@@ -33,9 +33,10 @@ int main(void)
     int k;
 
     enum Shade palette[9] = {BLK, BLK, DRK, DRK, MID, MID, LGT, LGT, CLR};
+    enum Colour colour = BRed;
 
     while (1) {
-        fill(CLR);
+        fill(CLR, Unset);
 
         set_pen(0, 0);
 
@@ -43,7 +44,7 @@ int main(void)
         secs_elapsed += get_dt();
 
         for (int i = 0; i < h; ++i, set_pen(0, i)) {
-            for(int j=0; j < w; ++j, set_pixel_at_pen(palette[k=t])) {
+            for(int j=0; j < w; ++j, set_pixel_at_pen(palette[k=t], colour)) {
                 X = (2. * j - w) / w;
                 Y = (2. * i - h) / h;
                 Z = 3;
@@ -87,6 +88,15 @@ int main(void)
         char key = fgetc(stdin);
         if (key == 'q')
             break;
+
+        switch (key) {
+            case 'r': colour = BRed; break;
+            case 'g': colour = BGreen; break;
+            case 'b': colour = BBlue; break;
+            case 'm': colour = BMagenta; break;
+            case 'y': colour = BYellow; break;
+            case 'c': colour = BCyan; break;
+        }
     }
 
     cleanup();
