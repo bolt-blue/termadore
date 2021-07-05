@@ -27,8 +27,17 @@ Note: If your terminal is using a dark-mode colour scheme, then the above shade 
 
 ## Building
 
-Currently in alpha testing.  
-Simply run `make` to build all targets, or `make screen` if you just want the screen object for linking.
+Currently in alpha testing. Default build is debug.  
+Build options are:
+```
+$> make
+$> make BUILD=release
+$> make screen
+$> make demo
+$> make demo-<demo-name>
+$> make test
+$> make test-<test-filename>
+```
 
 
 ## Usage
