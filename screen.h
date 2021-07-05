@@ -13,10 +13,28 @@ enum Shade {
     CLR = 0x2000000020000000
 };
 
-typedef union pixel {
+enum Colour {
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
+    BBlack,
+    BRed,
+    BGreen,
+    BYellow,
+    BBlue,
+    BMagenta,
+    BCyan,
+    BWhite,
+    Unset = -1
+};
+
+typedef struct pixel {
     enum Shade shd;
-    uint64_t i;
-    char code[8];
 } pixel;
 
 struct Screen {
@@ -25,6 +43,7 @@ struct Screen {
     pixel *pen;
     pixel *buffer;
     pixel *end;
+    char *col_buffer;
 };
 
 int kbhit();
@@ -34,10 +53,10 @@ void kill_window(void);
 void cleanup();
 int detect_resize(void);
 void render();
-void fill(enum Shade);
-void draw_line(int, int, int, enum Shade);
-void set_pixel(int, int, enum Shade);
-void set_pixel_at_pen(enum Shade);
+void fill(enum Shade, enum Colour);
+void draw_line(int, int, int, enum Shade, enum Colour);
+void set_pixel(int, int, enum Shade, enum Colour);
+void set_pixel_at_pen(enum Shade, enum Colour);
 void set_pen(int, int);
 void write_string(char *, int, int, int);
 int get_width();

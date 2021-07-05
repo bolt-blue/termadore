@@ -22,6 +22,7 @@ static float g_dt;
 
 #define NB_ENABLE 1
 #define NB_DISABLE 2
+#define reset_colour() fputs("\033[0m", stdout);
 #define reset() fputs("\033[2J", stdout)
 #define clear() fputs("\033[H\033[J", stdout)
 #define hidecur() fputs("\033[?25l", stdout)
@@ -97,6 +98,8 @@ int init_window(void)
     if (!g_screen.buffer)
         return 1;
 
+    g_screen.col_buffer = calloc(buf_h, buf_w * sizeof(enum Colour));
+
     g_screen.w = buf_w;
     g_screen.h = buf_h;
     g_screen.pen = g_screen.buffer;
@@ -129,6 +132,7 @@ void cleanup(void)
 {
     kill_window();
     stdinblock(NB_DISABLE);
+    reset_colour();
     // TODO: Make sure cursor was originally visible before setting it on
     showcur();
 }
@@ -175,21 +179,50 @@ void render(void)
     DEBUG_PRINT(0, g_screen.h - 1, "Sleeping for: %-9ld nanoseconds", rqtp.tv_nsec);
 
     pixel *cur = g_screen.buffer;
-    for (int i = 0; i < g_screen.h; i++, cur += g_screen.w) {
+    char *col_cur = g_screen.col_buffer;
+    enum Colour current_colour = *col_cur;
+
+    for (int i = 0; i < g_screen.h; i++, cur += g_screen.w, col_cur += g_screen.w) {
         // TODO: Investigate this off-by-one issue
         gotoxy(0, i + 1);
-        fwrite(cur, g_screen.w * sizeof(pixel), 1, stdout);
+
+        pixel *line_cur = cur;
+        for (int next_pos = 0, prev_pos = 0; next_pos < g_screen.w; next_pos++) {
+            if (col_cur[next_pos] != current_colour || next_pos == g_screen.w - 1) {
+                int len = next_pos - prev_pos + (next_pos == g_screen.w - 1);
+                fwrite(line_cur, len * sizeof(pixel), 1, stdout);
+
+                current_colour = col_cur[next_pos];
+                char col_code[14];
+                if (current_colour != Unset) {
+                    snprintf(col_code, 14, "\033[38;5;%dm", current_colour);
+                } else {
+                    snprintf(col_code, 8, "\033[0m");
+                }
+                fputs(col_code, stdout);
+
+                line_cur += next_pos - prev_pos;
+                prev_pos = next_pos;
+            }
+        }
+
     }
 
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
 }
 
-void fill(enum Shade px_type)
+void fill(enum Shade px_type, enum Colour px_col)
 {
     pixel *cur = g_screen.buffer;
     while (cur < g_screen.end) {
         cur->shd = px_type;
         cur++;
+    }
+    char *col_cur = g_screen.col_buffer;
+    char *col_buf_end = col_cur + g_screen.h * g_screen.w;
+    while (col_cur < col_buf_end) {
+        *col_cur = px_col;
+        col_cur++;
     }
 }
 
@@ -198,7 +231,7 @@ void fill(enum Shade px_type)
  * and continue on the next line.
  * TODO: Better response to error-case(s)
  */
-void draw_line(int x, int y, int len, enum Shade px_type)
+void draw_line(int x, int y, int len, enum Shade px_type, enum Colour px_col)
 {
     if (x < 0 || y < 0 || x >= g_screen.w || y >= g_screen.h)
         return;
@@ -214,19 +247,28 @@ void draw_line(int x, int y, int len, enum Shade px_type)
     }
 
     g_screen.pen = cur;
+
+    char *col_cur = g_screen.col_buffer + y * g_screen.w + x;
+
+    for (size_t i = 0; i < len; i++) {
+        *col_cur = px_col;
+        col_cur++;
+    }
 }
 
-void set_pixel(int x, int y, enum Shade px_type)
+void set_pixel(int x, int y, enum Shade px_type, enum Colour px_col)
 {
     if (x < 0 || y < 0 || x >= g_screen.w || y >= g_screen.h)
         return;
 
-    pixel *pos = g_screen.buffer + y * g_screen.w + x;
-    pos->shd = px_type;
+    int offset = y * g_screen.w + x;
+    g_screen.buffer[offset].shd = px_type;
+    g_screen.col_buffer[offset] = px_col;
 }
 
-void set_pixel_at_pen(enum Shade px_type)
+void set_pixel_at_pen(enum Shade px_type, enum Colour px_col)
 {
+    g_screen.col_buffer[g_screen.pen - g_screen.buffer] = px_col;
     g_screen.pen->shd = px_type;
     g_screen.pen++;
     if (g_screen.pen >= g_screen.end)
