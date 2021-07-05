@@ -34,10 +34,11 @@ $> make
 $> make BUILD=release
 $> make screen
 $> make demo
-$> make demo-<demo-name>
 $> make test
-$> make test-<test-filename>
+$> make test-<test-name>
 ```
+Any test file added to `tests` directory, with the format `test-somename.c` should automatically compile with `make`, or can be done individually as above. 
+You may have to include `-B` for the time being.
 
 
 ## Usage
