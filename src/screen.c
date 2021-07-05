@@ -129,6 +129,7 @@ int init_screen(void)
 void kill_window(void)
 {
     free(g_screen.buffer);
+    free(g_screen.col_buffer);
     clear();
 }
 
