@@ -1,7 +1,7 @@
 /* by camel-cdr - refactored by bolt-blue */
 /* cc torus.c -DH=32 -DW=64 -lm */
 
-#include "screen.h"
+#include "../screen.h"
 
 #include <math.h>
 #include <time.h>

@@ -16,9 +16,14 @@ $(basename $(OBJ)): $(OBJ)
 $(OBJ): %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-DEMOS = demo_basic demo_ripple demo_torus
+DEMODIR = demos
+DEMOSRC = $(wildcard $(DEMODIR)/*.c)
+DEMOS = $(patsubst $(DEMODIR)/%.c, $(DEMODIR)/%, $(DEMOSRC))
 .PHONY: demo
 demo: $(DEMOS)
+
+demo_%: $(DEMODIR)/%
+	# noop
 
 $(DEMOS): $(OBJ) $(addsuffix .c, $(DEMOS))
 	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@ $(LDLIBS)

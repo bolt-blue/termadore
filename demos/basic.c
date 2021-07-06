@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "screen.h"
+#include "../screen.h"
 
 // TODO: Add error handling
 int init_stripes()
