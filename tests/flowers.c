@@ -83,7 +83,7 @@ int main(void)
             originX = w / 2;
             originY = h / 2;
             a = w / 3.0;
-            step = w / 100.0;
+            step = w / 121.0;
         }
 
         if (!kbhit())
