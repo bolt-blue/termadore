@@ -34,7 +34,7 @@ test-%: $(TESTDIR)/%
 
 $(TESTS): $(OBJ)
 	echo $(TESTS)
-	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@
+	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@ $(LDLIBS)
 
 .PHONY: clean
 clean:
