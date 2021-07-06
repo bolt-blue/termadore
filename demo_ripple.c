@@ -154,6 +154,7 @@ int main(int argc, char **argv)
             break;
     }
 
+    free(rings);
     cleanup();
 
     return 0;
