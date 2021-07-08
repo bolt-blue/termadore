@@ -37,7 +37,7 @@ TESTS = $(patsubst $(TESTDIR)/%.c,$(TESTDIR)/%, $(TESTSRC))
 .PHONY: test
 test: $(TESTS)
 
-test-%: $(TESTDIR)/%
+test_%: $(TESTDIR)/%
 	
 
 %: %.c $(OBJ)
