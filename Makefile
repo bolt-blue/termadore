@@ -5,15 +5,21 @@ CFLAGS_release = -O3 -DNDEBUG
 CFLAGS := $(CFLAGS_$(BUILD)) -Wall
 LDLIBS := -lm
 
-OBJ := screen.o
+SRCDIR := src
+SRCS := $(wildcard $(SRCDIR)/*.c)
+
+INCDIRS := $(SRCDIR)
+INC := $(addprefix -I,$(INCDIRS))
+
+OBJ := $(patsubst $(SRCDIR)/%.c,$(SRCDIR)/%.o, $(SRCS))
 
 .PHONY: all
 all: $(OBJ) demo test
 
-.PHONY: $(basename $(OBJ))
-$(basename $(OBJ)): $(OBJ)
+.PHONY: $(notdir $(basename $(OBJ)))
+$(notdir $(basename $(OBJ))): $(OBJ)
 
-$(OBJ): %.o: %.c
+$(OBJ): %.o: %.c %.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 DEMODIR = demos
@@ -23,7 +29,7 @@ DEMOS = $(patsubst $(DEMODIR)/%.c,$(DEMODIR)/%, $(DEMOSRC))
 demo: $(DEMOS)
 
 demo_%: $(DEMODIR)/%
-	# noop
+	
 
 TESTDIR = tests
 TESTSRC = $(wildcard $(TESTDIR)/*.c)
@@ -32,10 +38,10 @@ TESTS = $(patsubst $(TESTDIR)/%.c,$(TESTDIR)/%, $(TESTSRC))
 test: $(TESTS)
 
 test-%: $(TESTDIR)/%
-	# noop
+	
 
 %: %.c $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) $< -o $@ $(LDLIBS)
+	$(CC) $(CFLAGS) $(INC) $(OBJ) $< -o $@ $(LDLIBS)
 
 .PHONY: clean
 clean:
