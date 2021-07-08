@@ -1,48 +1,50 @@
-BUILD ?= debug
+include defaults.mk
 
-CFLAGS_debug = -g -O0
-CFLAGS_release = -O3 -DNDEBUG
-CFLAGS := $(CFLAGS_$(BUILD)) -Wall
-LDLIBS := -lm
+SRCDIR := $(CURDIR)/src
+OBJDIR := $(CURDIR)/obj
+DEMODIR := $(CURDIR)/demos
+TESTDIR := $(CURDIR)/tests
 
-OBJ := screen.o
+INC := $(SRCDIR)
+INCDIRS := $(addprefix -I,$(INC))
+
+CFLAGS += $(INCDIRS)
 
 .PHONY: all
 all: $(OBJ) demo test
 
-.PHONY: $(basename $(OBJ))
-$(basename $(OBJ)): $(OBJ)
+OBJ := $(addprefix $(OBJDIR)/,$(LIBNAME).o)
 
-$(OBJ): %.o: %.c
+.PHONY: $(LIBNAME)
+$(LIBNAME): $(OBJ)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-DEMODIR = demos
-DEMOSRC = $(wildcard $(DEMODIR)/*.c)
-DEMOS = $(patsubst $(DEMODIR)/%.c, $(DEMODIR)/%, $(DEMOSRC))
-.PHONY: demo
-demo: $(DEMOS)
+$(OBJ): | $(OBJDIR)
 
-demo_%: $(DEMODIR)/%
-	# noop
+$(OBJDIR):
+	mkdir $(OBJDIR)
 
-$(DEMOS): $(OBJ) $(addsuffix .c, $(DEMOS))
-	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@ $(LDLIBS)
+# TODO: Can the export be done only for the demo and test rules?
+export OBJ
+export INCDIRS
 
-TESTDIR = tests
-TESTSRC = $(wildcard $(TESTDIR)/*.c)
-TESTS = $(patsubst $(TESTDIR)/%.c, $(TESTDIR)/%, $(TESTSRC))
-.PHONY: test
-test: $(TESTS)
+.PHONY: demo test
+demo: $(OBJ)
+	cd $(DEMODIR) && $(MAKE)
+demo_%: $(OBJ)
+	cd $(DEMODIR) && $(MAKE) $@
+test: $(OBJ)
+	cd $(TESTDIR) && $(MAKE)
+test-%: $(OBJ)
+	cd $(TESTDIR) && $(MAKE) $@
 
-test-%: $(TESTDIR)/%
-	# noop
+.PHONY: clean clean-test clean-demo
+clean: clean-test clean-demo
+	rm -rf $(OBJDIR)
 
-$(TESTS): $(OBJ)
-	echo $(TESTS)
-	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@
-
-.PHONY: clean
-clean:
-	rm -f $(TESTS)
-	rm -f $(DEMOS)
-	rm -f $(OBJ)
+clean-demo:
+	cd $(DEMODIR) && $(MAKE) clean
+clean-test:
+	cd $(TESTDIR) && $(MAKE) clean
