@@ -28,17 +28,17 @@ Note: If your terminal is using a dark-mode colour scheme, then the above shade 
 ## Building
 
 Currently in alpha testing. Default build is debug.  
-Build options are:
+Build options include:
+```Makefile
+make
+make BUILD=release
+make screen
+make demo
+make test
+make demo_<demo_name>
+make test_<test-name>
 ```
-$> make
-$> make BUILD=release
-$> make screen
-$> make demo
-$> make test
-$> make test-<test-name>
-```
-Any test file added to `tests` directory, with the format `test-somename.c` should automatically compile with `make`, or can be done individually as above. 
-You may have to include `-B` for the time being.
+Any `test` or `demo` added to the relevant directory should get automatically compiled, or can also be compiled individually following the format above, e.g. `demos/torus.c` may be directly compiled with `make demo_torus`.
 
 
 ## Usage
