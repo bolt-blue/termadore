@@ -18,28 +18,24 @@ $(OBJ): %.o: %.c
 
 DEMODIR = demos
 DEMOSRC = $(wildcard $(DEMODIR)/*.c)
-DEMOS = $(patsubst $(DEMODIR)/%.c, $(DEMODIR)/%, $(DEMOSRC))
+DEMOS = $(patsubst $(DEMODIR)/%.c,$(DEMODIR)/%, $(DEMOSRC))
 .PHONY: demo
 demo: $(DEMOS)
 
 demo_%: $(DEMODIR)/%
 	# noop
 
-$(DEMOS): $(OBJ) $(addsuffix .c, $(DEMOS))
-	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@ $(LDLIBS)
-
 TESTDIR = tests
 TESTSRC = $(wildcard $(TESTDIR)/*.c)
-TESTS = $(patsubst $(TESTDIR)/%.c, $(TESTDIR)/%, $(TESTSRC))
+TESTS = $(patsubst $(TESTDIR)/%.c,$(TESTDIR)/%, $(TESTSRC))
 .PHONY: test
 test: $(TESTS)
 
 test-%: $(TESTDIR)/%
 	# noop
 
-$(TESTS): $(OBJ)
-	echo $(TESTS)
-	$(CC) $(CFLAGS) $(OBJ) $@.c -o $@
+%: %.c $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $< -o $@ $(LDLIBS)
 
 .PHONY: clean
 clean:

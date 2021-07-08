@@ -163,6 +163,7 @@ void render(void)
     g_dt = (g_current_time.tv_sec + 1e-9 * g_current_time.tv_nsec)
                 - (g_last_time.tv_sec + 1e-9 * g_last_time.tv_nsec);
 
+    // TODO: Use (and draw from) a separate buffer for debug text
     DEBUG_PRINT(0, g_screen.h - 2, "Last: %ld:%-12ld | Current: %ld:%-12ld | dt: %.9f",
                 g_last_time.tv_sec, g_last_time.tv_nsec,
                 g_current_time.tv_sec, g_current_time.tv_nsec,
