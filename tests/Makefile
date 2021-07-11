@@ -1,33 +1,15 @@
-include ../defaults.mk
+include ../Makefile.inc
 
-ifeq ($(MAKELEVEL), 0)
-SRCDIR := ../src
-OBJDIR := ../obj
-OBJ := $(wildcard $(OBJDIR)/*.o)
+CFLAGS += ${MATHLIB}
 
-INC := $(SRCDIR)
-INCDIRS := $(addprefix -I,$(INC))
-endif
-
-CFLAGS += $(INCDIRS)
-
+# Or just list test names?
 TESTSRC = $(wildcard *.c)
 TESTS = $(patsubst %.c, %, $(TESTSRC))
 
 all: $(TESTS)
 
-%: %.c $(OBJ)
-ifndef OBJ
-	@echo "Required object(s) missing; run make in parent directory"
-	@exit 1
-endif
-	$(CC) $(CFLAGS) $(OBJ) $< -o $@ $(LDLIBS)
+.PHONY : clean
+clean :
+	${RM} ${TESTS} *.o
 
-test-%: %
-	@# noop
-
-.PHONY: clean
-clean:
-ifdef ($(TESTS)
-	rm $(TESTS)
-endif
+${TESTS} : ${RENDERLIB} ${MATHLIB}

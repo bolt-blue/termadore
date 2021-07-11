@@ -1,33 +1,15 @@
-include ../defaults.mk
+include ../Makefile.inc
 
-ifeq ($(MAKELEVEL), 0)
-SRCDIR := ../src
-OBJDIR := ../obj
-OBJ := $(wildcard $(OBJDIR)/*.o)
+CFLAGS += ${MATHLIB}
 
-INC := $(SRCDIR)
-INCDIRS := $(addprefix -I,$(INC))
-endif
-
-CFLAGS += $(INCDIRS)
-
+# Or just list demo names?
 DEMOSRC = $(wildcard *.c)
 DEMOS = $(patsubst %.c, %, $(DEMOSRC))
 
 all: $(DEMOS)
 
-%: %.c $(OBJ)
-ifndef OBJ
-	@echo "Required object(s) missing; run make in parent directory"
-	@exit 1
-endif
-	$(CC) $(CFLAGS) $(OBJ) $< -o $@ $(LDLIBS)
+.PHONY : clean
+clean :
+	${RM} ${DEMOS} *.o
 
-demo_%: %
-	@# noop
-
-.PHONY: clean
-clean:
-ifdef ($(TESTS)
-	rm $(DEMOS)
-endif
+${DEMOS} : ${RENDERLIB} ${MATHLIB}
