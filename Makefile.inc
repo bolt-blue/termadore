@@ -1,4 +1,3 @@
-# include defaults.mk
 BUILD ?= debug
 
 TOPDIR := ..

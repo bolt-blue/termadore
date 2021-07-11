@@ -2,11 +2,10 @@ include ../Makefile.inc
 
 CFLAGS += ${MATHLIB}
 
-# Or just list demo names?
 DEMOSRC = $(wildcard *.c)
 DEMOS = $(patsubst %.c, %, $(DEMOSRC))
 
-all: $(DEMOS)
+all : $(DEMOS)
 
 .PHONY : clean
 clean :
