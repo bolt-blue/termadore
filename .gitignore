@@ -1,1 +1,8 @@
-src/*.o
+# Files without extension except Makefiles
+*
+!*.*
+!*/
+!Makefile*
+
+# Object files
+*.o
