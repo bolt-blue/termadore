@@ -7,6 +7,6 @@ MATHLIB := -lm
 
 CFLAGS_debug = -g -O0
 CFLAGS_release = -O3 -DNDEBUG
-CFLAGS := $(CFLAGS_$(BUILD)) -I${INCLDIR} -Wall
+CFLAGS := $(CFLAGS_$(BUILD)) -Wall
 
 RM = rm -f
