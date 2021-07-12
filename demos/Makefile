@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-CFLAGS += ${MATHLIB} -I${INCLDIR}
+CFLAGS += -I${INCLDIR}
 
 DEMOSRC = $(wildcard *.c)
 DEMOS = $(patsubst %.c, %, $(DEMOSRC))
