@@ -28,18 +28,16 @@ Note: If your terminal is using a dark-mode colour scheme, then the above shade 
 ## Building
 
 Currently in alpha testing. Default build is debug.  
-Build options include:
-```Makefile
+`make` in project root compiles or cleans the entire project. In `demos` and `tests` directories, compile targets
+may be specified by name.
+```
+# root
 make
 make BUILD=release
-make screen
-make demo
-make test
-make demo_<demo_name>
-make test_<test-name>
+# demos/
+make basic
 ```
-Any `test` or `demo` added to the relevant directory should get automatically compiled, or can also be compiled individually following the format above, e.g. `demos/torus.c` may be directly compiled with `make demo_torus`.
-
+Any files added to `demos` and `tests` directories are added to compile targets automatically.
 
 ## Usage
 
