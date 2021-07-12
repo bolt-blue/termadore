@@ -28,18 +28,16 @@ Note: If your terminal is using a dark-mode colour scheme, then the above shade 
 ## Building
 
 Currently in alpha testing. Default build is debug.  
-Build options are:
+`make` in project root compiles or cleans the entire project. In `demos` and `tests` directories, compile targets
+may be specified by name.
 ```
-$> make
-$> make BUILD=release
-$> make screen
-$> make demo
-$> make test
-$> make test-<test-name>
+# root
+make
+make BUILD=release
+# demos/
+make basic
 ```
-Any test file added to `tests` directory, with the format `test-somename.c` should automatically compile with `make`, or can be done individually as above. 
-You may have to include `-B` for the time being.
-
+Any files added to `demos` and `tests` directories are added to compile targets automatically.
 
 ## Usage
 
