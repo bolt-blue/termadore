@@ -1,6 +1,8 @@
 include ../Makefile.inc
 
-${RENDERLIB} :
+${RENDERLIB} : ${SIGHANDLER}
+
+${SIGHANDLER} :
 
 .PHONY : clean
 clean :

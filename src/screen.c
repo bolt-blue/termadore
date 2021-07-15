@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "tdsignal.h"
 
 #include <sys/select.h>
 #include <sys/ioctl.h>
@@ -101,6 +102,9 @@ int init_window(void)
     g_screen.h = buf_h;
     g_screen.pen = g_screen.buffer;
     g_screen.end = g_screen.buffer + buf_w * buf_h;
+
+    // Register signal handler with the kernel
+    signal(SIGINT, sig_handler);
 
     return 0;
 }

@@ -3,6 +3,7 @@ BUILD ?= debug
 TOPDIR := ..
 INCLDIR := ${TOPDIR}/src
 RENDERLIB := ${INCLDIR}/screen.o
+SIGHANDLER := ${INCLDIR}/tdsignal.o
 MATHLIB := -lm
 
 CFLAGS_debug = -g -O0
