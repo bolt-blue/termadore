@@ -99,8 +99,6 @@ int init_window(void)
     if (!g_screen.buffer)
         return 1;
 
-    g_screen.col_buffer = calloc(buf_h, buf_w * sizeof(enum Colour));
-
     g_screen.w = buf_w;
     g_screen.h = buf_h;
     g_screen.pen = g_screen.buffer;
@@ -129,7 +127,6 @@ int init_screen(void)
 void kill_window(void)
 {
     free(g_screen.buffer);
-    free(g_screen.col_buffer);
     clear();
 }
 
@@ -184,34 +181,27 @@ void render(void)
     rqtp.tv_nsec = nspf - g_dt * 1e9;
     DEBUG_PRINT(0, g_screen.h - 1, "Sleeping for: %-9ld nanoseconds", rqtp.tv_nsec);
 
-    pixel *cur = g_screen.buffer;
-    char *col_cur = g_screen.col_buffer;
-    enum Colour current_colour = *col_cur;
-
-    for (int i = 0; i < g_screen.h; i++, cur += g_screen.w, col_cur += g_screen.w) {
+    pixel *line_cur = g_screen.buffer;
+    for (int i = 0; i < g_screen.h; i++, line_cur += g_screen.w) {
         // TODO: Investigate this off-by-one issue
         gotoxy(0, i + 1);
 
-        pixel *line_cur = cur;
-        for (int next_pos = 0, prev_pos = 0; next_pos < g_screen.w; next_pos++) {
-            if (col_cur[next_pos] != current_colour || next_pos == g_screen.w - 1) {
-                int len = next_pos - prev_pos + (next_pos == g_screen.w - 1);
-                fwrite(line_cur, len * sizeof(pixel), 1, stdout);
+        for (int j = 0; j < g_screen.w; j++) {
+            enum Colour colour = line_cur[j].col;
+            enum Shade shade = line_cur[j].shd;
+            char col_code[14] = {0};
 
-                current_colour = col_cur[next_pos];
-                char col_code[14];
-                if (current_colour != Unset) {
-                    snprintf(col_code, 14, "\033[38;5;%dm", current_colour);
-                } else {
-                    snprintf(col_code, 8, "\033[0m");
-                }
-                fputs(col_code, stdout);
-
-                line_cur += next_pos - prev_pos;
-                prev_pos = next_pos;
+            if (colour != Unset) {
+                snprintf(col_code, 14, "\033[38;5;%dm", colour);
+            } else {
+                // TODO: Maybe use a default instead of `Unset`
+                // - can then avoid need for this branch
+                snprintf(col_code, 8, "\033[0m");
             }
-        }
 
+            fputs(col_code, stdout);
+            fwrite(&shade, sizeof(shade), 1, stdout);
+        }
     }
 
     clock_nanosleep(CLOCK_MONOTONIC, 0, &rqtp, NULL);
@@ -222,13 +212,8 @@ void fill(enum Shade px_type, enum Colour px_col)
     pixel *cur = g_screen.buffer;
     while (cur < g_screen.end) {
         cur->shd = px_type;
+        cur->col = px_col;
         cur++;
-    }
-    char *col_cur = g_screen.col_buffer;
-    char *col_buf_end = col_cur + g_screen.h * g_screen.w;
-    while (col_cur < col_buf_end) {
-        *col_cur = px_col;
-        col_cur++;
     }
 }
 
@@ -249,17 +234,11 @@ void draw_line(int x, int y, int len, enum Shade px_type, enum Colour px_col)
 
     for (size_t i = 0; i < len; i++) {
         cur->shd = px_type;
+        cur->col = px_col;
         cur++;
     }
 
     g_screen.pen = cur;
-
-    char *col_cur = g_screen.col_buffer + y * g_screen.w + x;
-
-    for (size_t i = 0; i < len; i++) {
-        *col_cur = px_col;
-        col_cur++;
-    }
 }
 
 void set_pixel(int x, int y, enum Shade px_type, enum Colour px_col)
@@ -269,12 +248,12 @@ void set_pixel(int x, int y, enum Shade px_type, enum Colour px_col)
 
     int offset = y * g_screen.w + x;
     g_screen.buffer[offset].shd = px_type;
-    g_screen.col_buffer[offset] = px_col;
+    g_screen.buffer[offset].col = px_col;
 }
 
 void set_pixel_at_pen(enum Shade px_type, enum Colour px_col)
 {
-    g_screen.col_buffer[g_screen.pen - g_screen.buffer] = px_col;
+    g_screen.pen->col = px_col;
     g_screen.pen->shd = px_type;
     g_screen.pen++;
     if (g_screen.pen >= g_screen.end)
@@ -294,11 +273,22 @@ void set_pen(int x, int y)
 void write_string(char *str, int len, int x, int y)
 {
     // TODO: Find a nicer approach to this black magic
-    char *cur = (char *)(g_screen.buffer + y * g_screen.w + x);
-    memset(cur, 0, len * sizeof(pixel) / 2);
-    for (int i = 0; i < len; i++) {
-        memcpy(cur, str++, 1);
-        cur += sizeof(pixel) / 2;
+    // Will probably involve refactoring a few things
+
+    char buf[len + (len % 2)];
+    strncpy(buf, str, len);
+
+    if (len % 2) {
+        buf[len] = ' ';
+    }
+
+    // NOTE: We're going to be writing two chars per pixel
+    int steps = len / 2.0f + 0.5;
+
+    pixel *px = g_screen.buffer + y * g_screen.w + x;
+    for (int i = 0; i < steps; i++, px++) {
+        px->shd = 0;
+        memcpy(&px->shd, buf + i*2, 2);
     }
 }
 

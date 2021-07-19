@@ -35,6 +35,7 @@ enum Colour {
 
 typedef struct pixel {
     enum Shade shd;
+    enum Colour col;
 } pixel;
 
 struct Screen {
@@ -43,7 +44,6 @@ struct Screen {
     pixel *pen;
     pixel *buffer;
     pixel *end;
-    char *col_buffer;
 };
 
 int kbhit();
