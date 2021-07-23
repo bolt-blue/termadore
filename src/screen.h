@@ -46,21 +46,21 @@ struct Screen {
     pixel *end;
 };
 
-int kbhit();
+int kbhit(void);
 int init_window(void);
-int init_screen();
+int init_screen(void);
 void kill_window(void);
-void cleanup();
+void cleanup(void);
 int detect_resize(void);
-void render();
+void render(void);
 void fill(enum Shade, enum Colour);
 void draw_line(int, int, int, enum Shade, enum Colour);
 void set_pixel(int, int, enum Shade, enum Colour);
 void set_pixel_at_pen(enum Shade, enum Colour);
 void set_pen(int, int);
 void write_string(char *, int, int, int);
-int get_width();
-int get_height();
-float get_dt();
+int get_width(void);
+int get_height(void);
+float get_dt(void);
 
 #endif /* SCREEN_H */
