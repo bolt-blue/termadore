@@ -11,7 +11,7 @@ int init_stripes()
     enum Colour colour = Unset;
 
     for (int i = 0; i < height; i++) {
-        draw_line(0, i, width, line_shade, colour);
+        draw_line(0, i, width, i, line_shade, colour);
         line_shade = line_shade == MID ? LGT : MID;
     }
 
