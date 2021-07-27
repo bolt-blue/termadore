@@ -1,3 +1,7 @@
+## **WARNING**
+This branch is unstable and only for review.  
+It is susceptible to history alteration, e.g. rebasing.
+
 # Termadore
 
 A nod to times past, in homage to the demo scene days of the Commodore64.
