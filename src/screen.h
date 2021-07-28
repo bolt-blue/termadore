@@ -57,11 +57,6 @@ int detect_resize(void);
 void render(void);
 void fill(enum Shade, enum Colour);
 
-// TODO: Remove superfluous `draw_` prefix
-void draw_line(int, int, int, int, enum Shade, enum Colour);
-void draw_rect(int, int, int, int, enum Shade, enum Shade, enum Colour, enum Colour);
-void draw_elipse(int, int, int, int, enum Shade, enum Shade, enum Colour, enum Colour);
-
 void set_pixel(int, int, enum Shade, enum Colour);
 void set_pixel_at_pen(enum Shade, enum Colour);
 void set_pen(int, int);

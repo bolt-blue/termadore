@@ -6,4 +6,4 @@ demos/*
 !Makefile*
 
 # Object files
-*.o
+*.[oa]

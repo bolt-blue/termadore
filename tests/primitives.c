@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "screen.h"
+#include "termadore.h"
 
 // TODO: Add error handling
 

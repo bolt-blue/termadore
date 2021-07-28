@@ -1,6 +1,71 @@
-/* SPDX-License-Identifier: GPL-2.0-only */
-#ifndef MATHUTILS_H
-#define MATHUTILS_H
+#include "drawutils.h"
+
+#include <math.h>
+#include <stdlib.h>
+
+
+// Prototypes
+int line_clip(int *x0_out, int *y0_out, int *x1_out, int *y1_out,
+              int xmin, int xmax, int ymin, int ymax);
+
+/*
+ * TODO:
+ * - Write tests
+ * - Better response to error-case(s)
+ */
+
+void draw_line(int x1, int y1, int x2, int y2, enum Shade px_type, enum Colour px_col)
+{
+    if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height()))
+        return;
+
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+
+    float x_step = (float)dx / steps;
+    float y_step = (float)dy / steps;
+
+    float cur_x = x1;
+    float cur_y = y1;
+
+    for (int i = 0; i < steps; i++) {
+        set_pixel((int)cur_x, (int)cur_y, px_type, px_col);
+        cur_x += x_step;
+        cur_y += y_step;
+    }
+}
+
+void draw_rect(int x, int y, int w, int h, enum Shade shd, enum Shade fill_shd,
+               enum Colour col, enum Colour fill_col)
+{
+    draw_line(x, y, x + w, y, shd, col);
+    draw_line(x, y + h - 1, x + w, y + h - 1, shd, col);
+    draw_line(x, y + 1, x, y + h - 1, shd, col);
+    draw_line(x + w - 1, y + 1, x + w - 1, y + h - 1, shd, col);
+}
+
+void draw_elipse(int x, int y, int w, int h, enum Shade shd, enum Shade fill_shd,
+                 enum Colour col, enum Colour fill_col)
+{
+    // Major (a) and Minor (b) axes
+    float a = w >= h ? w / 2 : h / 2;
+    float b = w >= h ? h / 2 : w / 2;
+
+    float x_offset = x + (float)w / 2;
+    float y_offset = y + (float)h / 2;
+
+    for (float i = 0; i < 360; i += 0.5) {
+        int px_x = a * cos(i) + x_offset;
+        int px_y = b * sin(i) + y_offset;
+        set_pixel(px_x, px_y, shd, col);
+    }
+}
+
+
+/* ========================================================================== */
+
 
 #define bool char
 #define false 0
@@ -120,5 +185,3 @@ int line_clip(int *x0_out, int *y0_out, int *x1_out, int *y1_out,
     return accept;
 }
 #endif // CSCLIP
-
-#endif /* MATHUTILS_H */

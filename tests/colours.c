@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "termadore.h"
 
 #include <stdio.h>
 
@@ -10,7 +10,7 @@ int init_colours()
     int width = get_width();
 
     for (int i = 0; i < 16; i++) {
-        draw_line(0, i, width, line_shade, c[i]);
+        draw_line(0, i, width, i, line_shade, c[i]);
     }
 
     return 0;

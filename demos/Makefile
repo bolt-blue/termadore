@@ -11,4 +11,4 @@ all : $(DEMOS)
 clean :
 	${RM} ${DEMOS} *.o
 
-${DEMOS} : ${RENDERLIB} ${SIGHANDLER} ${MATHLIB}
+${DEMOS} : ${RENDERLIB} ${MATHLIB}

@@ -11,4 +11,4 @@ all : $(TESTS)
 clean :
 	${RM} ${TESTS} *.o
 
-${TESTS} : ${RENDERLIB} ${SIGHANDLER} ${MATHLIB}
+${TESTS} : ${RENDERLIB} ${MATHLIB}

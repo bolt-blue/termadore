@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "termadore.h"
 
 #include <stdlib.h>
 #include <math.h>

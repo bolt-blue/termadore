@@ -1,8 +1,10 @@
 include ../Makefile.inc
 
-${RENDERLIB} : ${SIGHANDLER}
+${RENDERLIB} : screen.o drawutils.o tdsignal.o
+	ar -rc libtermadore.a $?
 
-${SIGHANDLER} :
+%.o: %.c
+	${CC} ${CFLAGS} -c $^
 
 .PHONY : clean
 clean :
