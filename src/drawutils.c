@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define PI 3.14159265f
 
 // Prototypes
 int line_clip(int *x0_out, int *y0_out, int *x1_out, int *y1_out,
@@ -24,6 +25,8 @@ struct point Origin = {
     .y = 0,
 };
 
+float theta = 0.0f;
+
 void shade(enum Shade new)
 {
     Settings.shd = new;
@@ -40,11 +43,39 @@ void translate(int x, int y)
     Origin.y = y;
 }
 
+void rotate(float angle)
+{
+    if (angle >= 360.0f)		/* Wrap angle */
+	angle = fmod(angle, 360.0f);
+
+    theta += angle;
+
+    if (theta >= 360.0f)		/* Wrap theta */
+	theta -= 360.0f;
+}
+
+static struct point *rotated_point(int x, int y)
+{
+    struct point *out = malloc(sizeof(struct point));
+    float rads = theta * PI / 180.0f;
+
+    out->x = x * cos(rads) - y * sin(rads);
+    out->y = x * sin(rads) + y * cos(rads);
+
+    return out;
+}
+
 void line(int x1, int y1, int x2, int y2)
 {
-    if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height()))
-        return;
+    struct point *point1 = rotated_point(x1, y1);
+    struct point *point2 = rotated_point(x2, y2);
+    /* if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height())) */
+    /*     return; */
 
+    x1 = Origin.x + point1->x;
+    x2 = Origin.x + point2->x;
+    y1 = Origin.y + point1->y;
+    y2 = Origin.y + point2->y;
     int dx = x2 - x1;
     int dy = y2 - y1;
 
@@ -61,6 +92,9 @@ void line(int x1, int y1, int x2, int y2)
         cur_x += x_step;
         cur_y += y_step;
     }
+
+    free(point1);
+    free(point2);
 }
 
 void rect(int x, int y, int w, int h)
@@ -73,6 +107,10 @@ void rect(int x, int y, int w, int h)
 
 void ellipse(int x, int y, int w, int h)
 {
+    struct point *point = rotated_point(x, y);
+    x = Origin.x + point->x;
+    y = Origin.y + point->y;
+
     // Major (a) and Minor (b) axes
     float a = w >= h ? w / 2 : h / 2;
     float b = w >= h ? h / 2 : w / 2;
@@ -85,6 +123,8 @@ void ellipse(int x, int y, int w, int h)
         int px_y = b * sin(i) + y_offset;
         set_pixel(px_x, px_y, Settings.shd, Settings.col);
     }
+
+    free(point);
 }
 
 
