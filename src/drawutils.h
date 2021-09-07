@@ -12,6 +12,13 @@ struct setting {
 void shade(enum Shade);
 void colour(enum Colour);
 
+struct point {
+    int x;
+    int y;
+};
+
+void translate(int, int);
+
 void line(int, int, int, int);
 void rect(int, int, int, int);
 void ellipse(int, int, int, int);

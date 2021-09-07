@@ -19,6 +19,11 @@ struct setting Settings = {
     .col = White,
 };
 
+struct point Origin = {
+    .x = 0,
+    .y = 0,
+};
+
 void shade(enum Shade new)
 {
     Settings.shd = new;
@@ -27,6 +32,12 @@ void shade(enum Shade new)
 void colour(enum Colour new)
 {
     Settings.col = new;
+}
+
+void translate(int x, int y)
+{
+    Origin.x = x;
+    Origin.y = y;
 }
 
 void line(int x1, int y1, int x2, int y2)
