@@ -14,7 +14,12 @@ int line_clip(int *x0_out, int *y0_out, int *x1_out, int *y1_out,
  * - Better response to error-case(s)
  */
 
-void draw_line(int x1, int y1, int x2, int y2, enum Shade px_type, enum Colour px_col)
+struct setting Settings = {
+    .shd = BLK,		/* C99 */
+    .col = White,
+};
+
+void draw_line(int x1, int y1, int x2, int y2)
 {
     if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height()))
         return;
@@ -31,23 +36,21 @@ void draw_line(int x1, int y1, int x2, int y2, enum Shade px_type, enum Colour p
     float cur_y = y1;
 
     for (int i = 0; i < steps; i++) {
-        set_pixel((int)cur_x, (int)cur_y, px_type, px_col);
+        set_pixel((int)cur_x, (int)cur_y, Settings.shd, Settings.col);
         cur_x += x_step;
         cur_y += y_step;
     }
 }
 
-void draw_rect(int x, int y, int w, int h, enum Shade shd, enum Shade fill_shd,
-               enum Colour col, enum Colour fill_col)
+void draw_rect(int x, int y, int w, int h)
 {
-    draw_line(x, y, x + w, y, shd, col);
-    draw_line(x, y + h - 1, x + w, y + h - 1, shd, col);
-    draw_line(x, y + 1, x, y + h - 1, shd, col);
-    draw_line(x + w - 1, y + 1, x + w - 1, y + h - 1, shd, col);
+    draw_line(x, y, x + w, y);
+    draw_line(x, y + h - 1, x + w, y + h - 1);
+    draw_line(x, y + 1, x, y + h - 1);
+    draw_line(x + w - 1, y + 1, x + w - 1, y + h - 1);
 }
 
-void draw_elipse(int x, int y, int w, int h, enum Shade shd, enum Shade fill_shd,
-                 enum Colour col, enum Colour fill_col)
+void draw_elipse(int x, int y, int w, int h)
 {
     // Major (a) and Minor (b) axes
     float a = w >= h ? w / 2 : h / 2;
@@ -59,7 +62,7 @@ void draw_elipse(int x, int y, int w, int h, enum Shade shd, enum Shade fill_shd
     for (float i = 0; i < 360; i += 0.5) {
         int px_x = a * cos(i) + x_offset;
         int px_y = b * sin(i) + y_offset;
-        set_pixel(px_x, px_y, shd, col);
+        set_pixel(px_x, px_y, Settings.shd, Settings.col);
     }
 }
 

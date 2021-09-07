@@ -32,28 +32,28 @@ int main(int argc, char **argv)
                      .x2 = get_width() / 2, .y2 = 0};
     //draw_line(l.x1, l.y1, l.x2, l.y2, DRK, Blue);
 
-    draw_line(0, 0, 0, get_height(), BLK, Green);
-    draw_line(1, 0, 1, get_height() - 1, BLK, Green);
-    draw_line(get_width() - 1, 2, get_width() - 1, get_height(), BLK, Green);
+    draw_line(0, 0, 0, get_height());
+    draw_line(1, 0, 1, get_height() - 1);
+    draw_line(get_width() - 1, 2, get_width() - 1, get_height());
 
-    draw_line(2, 0, get_width(), 0, BLK, Blue);
-    draw_line(2, 1, get_width() - 1, 1, BLK, Blue);
-    draw_line(2, get_height() - 1, get_width() - 1, get_height() - 1, BLK, Blue);
+    draw_line(2, 0, get_width(), 0);
+    draw_line(2, 1, get_width() - 1, 1);
+    draw_line(2, get_height() - 1, get_width() - 1, get_height() - 1);
 
-    draw_line(5, 7, 7, 7, BLK, Magenta);
+    draw_line(5, 7, 7, 7);
 
-    draw_line(5, 5, get_width() - 5, get_height() - 5, BLK, Red);
-    draw_line(get_width() - 6, 5, 4, get_height() - 5, BLK, Cyan);
+    draw_line(5, 5, get_width() - 5, get_height() - 5);
+    draw_line(get_width() - 6, 5, 4, get_height() - 5);
 
     set_pixel(5, 5, BLK, Cyan);
     set_pixel(get_width() - 6, get_height() - 6, BLK, Cyan);
     set_pixel(5, get_height() - 6, BLK, Red);
     set_pixel(get_width() - 6, 5, BLK, Red);
 
-    draw_rect(10, get_height() / 2 - 4, 18, 9, BLK, CLR, White, Unset);
+    draw_rect(10, get_height() / 2 - 4, 18, 9);
 
-    draw_elipse(10, get_height() / 2 - 4, 18, 9, BLK, CLR, BRed, Unset);
-    draw_elipse(1, 1, get_width() - 1, get_height() - 1, BLK, CLR, BBlue, Unset);
+    draw_elipse(10, get_height() / 2 - 4, 18, 9);
+    draw_elipse(1, 1, get_width() - 1, get_height() - 1);
 
     while (1) {
         // NOTE: This is where real work would be done, prior to rendering
