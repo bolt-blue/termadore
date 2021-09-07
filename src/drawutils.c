@@ -19,6 +19,16 @@ struct setting Settings = {
     .col = White,
 };
 
+void shade(enum Shade new)
+{
+    Settings.shd = new;
+}
+
+void colour(enum Colour new)
+{
+    Settings.col = new;
+}
+
 void line(int x1, int y1, int x2, int y2)
 {
     if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height()))
