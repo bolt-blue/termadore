@@ -19,6 +19,7 @@ struct point {
 
 void translate(int, int);
 void rotate(float);
+void scale(float);
 
 void line(int, int, int, int);
 void rect(int, int, int, int);

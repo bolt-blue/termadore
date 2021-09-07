@@ -25,7 +25,8 @@ struct point Origin = {
     .y = 0,
 };
 
-float theta = 0.0f;
+float theta = 0.0f;		/* Rotation angle, additive */
+float scaling = 1.0f;		/* Scaling factor, multiplicative */
 
 void shade(enum Shade new)
 {
@@ -54,6 +55,12 @@ void rotate(float angle)
 	theta -= 360.0f;
 }
 
+void scale(float factor)
+{
+    factor = fabs(factor);	/* Don't allow negative scaling*/
+    scaling *= factor;
+}
+
 static struct point *rotated_point(int x, int y)
 {
     struct point *out = malloc(sizeof(struct point));
@@ -72,10 +79,10 @@ void line(int x1, int y1, int x2, int y2)
     /* if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height())) */
     /*     return; */
 
-    x1 = Origin.x + point1->x;
-    x2 = Origin.x + point2->x;
-    y1 = Origin.y + point1->y;
-    y2 = Origin.y + point2->y;
+    x1 = Origin.x + scaling * point1->x;
+    x2 = Origin.x + scaling * point2->x;
+    y1 = Origin.y + scaling * point1->y;
+    y2 = Origin.y + scaling * point2->y;
     int dx = x2 - x1;
     int dy = y2 - y1;
 
@@ -108,8 +115,8 @@ void rect(int x, int y, int w, int h)
 void ellipse(int x, int y, int w, int h)
 {
     struct point *point = rotated_point(x, y);
-    x = Origin.x + point->x;
-    y = Origin.y + point->y;
+    x = Origin.x + scaling * point->x;
+    y = Origin.y + scaling * point->y;
 
     // Major (a) and Minor (b) axes
     float a = w >= h ? w / 2 : h / 2;
