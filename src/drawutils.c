@@ -19,7 +19,7 @@ struct setting Settings = {
     .col = White,
 };
 
-void draw_line(int x1, int y1, int x2, int y2)
+void line(int x1, int y1, int x2, int y2)
 {
     if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height()))
         return;
@@ -42,15 +42,15 @@ void draw_line(int x1, int y1, int x2, int y2)
     }
 }
 
-void draw_rect(int x, int y, int w, int h)
+void rect(int x, int y, int w, int h)
 {
-    draw_line(x, y, x + w, y);
-    draw_line(x, y + h - 1, x + w, y + h - 1);
-    draw_line(x, y + 1, x, y + h - 1);
-    draw_line(x + w - 1, y + 1, x + w - 1, y + h - 1);
+    line(x, y, x + w, y);
+    line(x, y + h - 1, x + w, y + h - 1);
+    line(x, y + 1, x, y + h - 1);
+    line(x + w - 1, y + 1, x + w - 1, y + h - 1);
 }
 
-void draw_elipse(int x, int y, int w, int h)
+void ellipse(int x, int y, int w, int h)
 {
     // Major (a) and Minor (b) axes
     float a = w >= h ? w / 2 : h / 2;

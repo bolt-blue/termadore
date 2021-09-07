@@ -10,8 +10,8 @@ struct setting {
 };
 
 // TODO: Remove superfluous `draw_` prefix
-void draw_line(int, int, int, int);
-void draw_rect(int, int, int, int);
-void draw_elipse(int, int, int, int);
+void line(int, int, int, int);
+void rect(int, int, int, int);
+void ellipse(int, int, int, int);
 
 #endif /* DRAWUTILS_H */
