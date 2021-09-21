@@ -61,8 +61,8 @@ static void rotate_point(int *x, int *y)
     float rads = state.rotate_angle * PI / 180.0f;
     int tmp = *x;
 
-    *x = *x * cos(rads) - *y * sin(rads);
-    *y = tmp * sin(rads) + *y * cos(rads);
+    *x = round(*x * cos(rads) - *y * sin(rads));
+    *y = round(tmp * sin(rads) + *y * cos(rads));
 }
 
 void line(int x1, int y1, int x2, int y2)
