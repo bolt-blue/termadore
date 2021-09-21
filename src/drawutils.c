@@ -70,37 +70,46 @@ void line(int x1, int y1, int x2, int y2)
     rotate_point(&x1, &y1);
     rotate_point(&x2, &y2);
 
-    /* if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height())) */
-    /*     return; */
-
     x1 = state.origin.x + state.scale_factor * x1;
     x2 = state.origin.x + state.scale_factor * x2;
     y1 = state.origin.y + state.scale_factor * y1;
     y2 = state.origin.y + state.scale_factor * y2;
-    int dx = x2 - x1;
-    int dy = y2 - y1;
 
-    int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+    /* if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height())) */
+    /*     return; */
 
-    float x_step = (float)dx / steps;
-    float y_step = (float)dy / steps;
+    int dx = abs(x2 - x1);
+    int dy = -abs(y2 - y1);
+    int step_x = x1 < x2 ? 1 : -1;
+    int step_y = y1 < y2 ? 1 : -1;
+    int dxy = dx + dy;
+    int error;
 
-    float cur_x = x1;
-    float cur_y = y1;
+    while (1) {
+        set_pixel(x1, y1, state.shd, state.col);
+	if (x1 == x2 && y1 == y2)
+	    break;
 
-    for (int i = 0; i < steps; i++) {
-        set_pixel((int)cur_x, (int)cur_y, state.shd, state.col);
-        cur_x += x_step;
-        cur_y += y_step;
+	error = 2 * dxy;
+
+	if (error >= dy) {	/* error_xy + error_x > 0 */
+	    dxy += dy;
+	    x1 += step_x;
+	}
+
+	if (error <= dx) {	/* error_xy + error_y < 0 */
+	    dxy += dx;
+	    y1 += step_y;
+	}
     }
 }
 
 void rect(int x, int y, int w, int h)
 {
     line(x, y, x + w, y);
-    line(x, y + h - 1, x + w, y + h - 1);
-    line(x, y + 1, x, y + h - 1);
-    line(x + w - 1, y + 1, x + w - 1, y + h - 1);
+    line(x, y + h, x + w, y + h);
+    line(x, y, x, y + h);
+    line(x + w, y, x + w, y + h);
 }
 
 void ellipse(int x, int y, int w, int h)
