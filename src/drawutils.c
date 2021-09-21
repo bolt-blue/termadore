@@ -61,28 +61,27 @@ void scale(float factor)
     scaling *= factor;
 }
 
-static struct point *rotated_point(int x, int y)
+static void rotate_point(int *x, int *y)
 {
-    struct point *out = malloc(sizeof(struct point));
     float rads = theta * PI / 180.0f;
+    int tmp = *x;
 
-    out->x = x * cos(rads) - y * sin(rads);
-    out->y = x * sin(rads) + y * cos(rads);
-
-    return out;
+    *x = *x * cos(rads) - *y * sin(rads);
+    *y = tmp * sin(rads) + *y * cos(rads);
 }
 
 void line(int x1, int y1, int x2, int y2)
 {
-    struct point *point1 = rotated_point(x1, y1);
-    struct point *point2 = rotated_point(x2, y2);
+    rotate_point(&x1, &y1);
+    rotate_point(&x2, &y2);
+
     /* if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height())) */
     /*     return; */
 
-    x1 = Origin.x + scaling * point1->x;
-    x2 = Origin.x + scaling * point2->x;
-    y1 = Origin.y + scaling * point1->y;
-    y2 = Origin.y + scaling * point2->y;
+    x1 = Origin.x + scaling * x1;
+    x2 = Origin.x + scaling * x2;
+    y1 = Origin.y + scaling * y1;
+    y2 = Origin.y + scaling * y2;
     int dx = x2 - x1;
     int dy = y2 - y1;
 
@@ -99,9 +98,6 @@ void line(int x1, int y1, int x2, int y2)
         cur_x += x_step;
         cur_y += y_step;
     }
-
-    free(point1);
-    free(point2);
 }
 
 void rect(int x, int y, int w, int h)
@@ -114,9 +110,9 @@ void rect(int x, int y, int w, int h)
 
 void ellipse(int x, int y, int w, int h)
 {
-    struct point *point = rotated_point(x, y);
-    x = Origin.x + scaling * point->x;
-    y = Origin.y + scaling * point->y;
+    rotate_point(&x, &y);
+    x = Origin.x + scaling * x;
+    y = Origin.y + scaling * y;
 
     // Major (a) and Minor (b) axes
     float a = w >= h ? w / 2 : h / 2;
@@ -130,8 +126,6 @@ void ellipse(int x, int y, int w, int h)
         int px_y = b * sin(i) + y_offset;
         set_pixel(px_x, px_y, Settings.shd, Settings.col);
     }
-
-    free(point);
 }
 
 
