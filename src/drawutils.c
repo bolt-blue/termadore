@@ -15,55 +15,50 @@ int line_clip(int *x0_out, int *y0_out, int *x1_out, int *y1_out,
  * - Better response to error-case(s)
  */
 
-struct setting Settings = {
-    .shd = BLK,		/* C99 */
+static struct Settings state = {
+    .origin = {0, 0},		/* C99 */
+    .rotate_angle = 0.0f,
+    .scale_factor = 1.0f,
+    .shd = BLK,
     .col = White,
 };
 
-struct point Origin = {
-    .x = 0,
-    .y = 0,
-};
-
-float theta = 0.0f;		/* Rotation angle, additive */
-float scaling = 1.0f;		/* Scaling factor, multiplicative */
-
 void shade(enum Shade new)
 {
-    Settings.shd = new;
+    state.shd = new;
 }
 
 void colour(enum Colour new)
 {
-    Settings.col = new;
+    state.col = new;
 }
 
 void translate(int x, int y)
 {
-    Origin.x = x;
-    Origin.y = y;
+    state.origin.x = x;
+    state.origin.y = y;
 }
 
 void rotate(float angle)
 {
-    if (angle >= 360.0f)		/* Wrap angle */
+    if (angle >= 360.0f)	/* Wrap angle */
 	angle = fmod(angle, 360.0f);
 
-    theta += angle;
+    state.rotate_angle += angle;
 
-    if (theta >= 360.0f)		/* Wrap theta */
-	theta -= 360.0f;
+    if (state.rotate_angle >= 360.0f) /* Wrap theta */
+	state.rotate_angle -= 360.0f;
 }
 
 void scale(float factor)
 {
-    factor = fabs(factor);	/* Don't allow negative scaling*/
-    scaling *= factor;
+    factor = fabs(factor);	/* Don't allow negative state.scale_factor*/
+    state.scale_factor *= factor;
 }
 
 static void rotate_point(int *x, int *y)
 {
-    float rads = theta * PI / 180.0f;
+    float rads = state.rotate_angle * PI / 180.0f;
     int tmp = *x;
 
     *x = *x * cos(rads) - *y * sin(rads);
@@ -78,10 +73,10 @@ void line(int x1, int y1, int x2, int y2)
     /* if (!line_clip(&x1, &y1, &x2, &y2, 0, get_width(), 0, get_height())) */
     /*     return; */
 
-    x1 = Origin.x + scaling * x1;
-    x2 = Origin.x + scaling * x2;
-    y1 = Origin.y + scaling * y1;
-    y2 = Origin.y + scaling * y2;
+    x1 = state.origin.x + state.scale_factor * x1;
+    x2 = state.origin.x + state.scale_factor * x2;
+    y1 = state.origin.y + state.scale_factor * y1;
+    y2 = state.origin.y + state.scale_factor * y2;
     int dx = x2 - x1;
     int dy = y2 - y1;
 
@@ -94,7 +89,7 @@ void line(int x1, int y1, int x2, int y2)
     float cur_y = y1;
 
     for (int i = 0; i < steps; i++) {
-        set_pixel((int)cur_x, (int)cur_y, Settings.shd, Settings.col);
+        set_pixel((int)cur_x, (int)cur_y, state.shd, state.col);
         cur_x += x_step;
         cur_y += y_step;
     }
@@ -111,8 +106,8 @@ void rect(int x, int y, int w, int h)
 void ellipse(int x, int y, int w, int h)
 {
     rotate_point(&x, &y);
-    x = Origin.x + scaling * x;
-    y = Origin.y + scaling * y;
+    x = state.origin.x + state.scale_factor * x;
+    y = state.origin.y + state.scale_factor * y;
 
     // Major (a) and Minor (b) axes
     float a = w >= h ? w / 2 : h / 2;
@@ -124,7 +119,7 @@ void ellipse(int x, int y, int w, int h)
     for (float i = 0; i < 360; i += 0.5) {
         int px_x = a * cos(i) + x_offset;
         int px_y = b * sin(i) + y_offset;
-        set_pixel(px_x, px_y, Settings.shd, Settings.col);
+        set_pixel(px_x, px_y, state.shd, state.col);
     }
 }
 

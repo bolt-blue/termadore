@@ -4,23 +4,24 @@
 
 #include "screen.h"
 
-struct setting {
+struct Point {
+    int x;
+    int y;
+};
+
+struct Settings {
+    struct Point origin;
+    float rotate_angle;
+    float scale_factor;
     enum Shade shd;
     enum Colour col;
 };
 
 void shade(enum Shade);
 void colour(enum Colour);
-
-struct point {
-    int x;
-    int y;
-};
-
 void translate(int, int);
 void rotate(float);
 void scale(float);
-
 void line(int, int, int, int);
 void rect(int, int, int, int);
 void ellipse(int, int, int, int);
