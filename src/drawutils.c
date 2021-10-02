@@ -107,9 +107,9 @@ void line(int x1, int y1, int x2, int y2)
 void rect(int x, int y, int w, int h)
 {
     line(x, y, x + w, y);
-    line(x, y + h, x + w, y + h);
-    line(x, y, x, y + h);
-    line(x + w, y, x + w, y + h);
+    line(x, y - h, x + w, y - h);
+    line(x, y, x, y - h);
+    line(x + w, y, x + w, y - h);
 }
 
 void ellipse(int x, int y, int w, int h)
