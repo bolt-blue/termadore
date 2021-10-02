@@ -5,6 +5,10 @@
 
 #define PI 3.14159265f
 
+/* Math helpers */
+/* TODO: separate header */
+#define IS_EVEN(x) ~(x) & 1
+
 // Prototypes
 int line_clip(int *x0_out, int *y0_out, int *x1_out, int *y1_out,
               int xmin, int xmax, int ymin, int ymax);
@@ -112,23 +116,190 @@ void rect(int x, int y, int w, int h)
     line(x + w, y, x + w, y - h);
 }
 
+/* See "Raster Algorithms for 2D Primitives" (Da Silva, 1989) */
+/* Available at: https://cs.brown.edu/research/pubs/theses/masters/1989/dasilva.pdf  */
 void ellipse(int x, int y, int w, int h)
 {
+    w *= state.scale_factor;
+    h *= state.scale_factor;
+
+    /* Require a >= b */
+    float a, b;
+    float angle_rads = state.rotate_angle;
+    if (w >= h) {
+        a = w / 2.0f;
+        b = h / 2.0f;
+    } else {
+        angle_rads += 90.0f;
+        b = w / 2.0f;
+        a = h / 2.0f;
+    }
+    angle_rads *= PI / 180.0f;
+
+    /* Foci */
+    float a2 = a * a;
+    float c = sqrt(a2 - b * b);
+    float xf = c * cos(angle_rads);
+    float yf = c * sin(angle_rads);
+    float xf2 = xf * xf;
+    float yf2 = yf * yf;
+
+    /* Centre */
+    x += IS_EVEN(w) ? w / 2 : w / 2 + 1; /* TODO: why not round()? */
+    y -= IS_EVEN(h) ? h / 2 : h / 2 + 1;
     rotate_point(&x, &y);
-    x = state.origin.x + state.scale_factor * x;
-    y = state.origin.y + state.scale_factor * y;
+    int cx = state.origin.x + x;
+    int cy = state.origin.y + y;
 
-    // Major (a) and Minor (b) axes
-    float a = w >= h ? w / 2 : h / 2;
-    float b = w >= h ? h / 2 : w / 2;
+    /* Coefficients of implicit equation F(x, y) = Ax2 + Bxy + Cy2 + D = 0 */
+    float A = a2 - xf2;
+    float B = -2 * xf * yf;
+    float C = a2 - yf2;
+    float D = a2 * (yf2 - A);
 
-    float x_offset = x + (float)w / 2;
-    float y_offset = y + (float)h / 2;
+    float A2 = A + A;
+    float B2 = B + B;
+    float C2 = C + C;
+    float B_2 = B / 2;
 
-    for (float i = 0; i < 360; i += 0.5) {
-        int px_x = a * cos(i) + x_offset;
-        int px_y = b * sin(i) + y_offset;
-        set_pixel(px_x, px_y, state.shd, state.col);
+    /* Region boundaries */
+    int XV, YV, YR, XH, XL;
+    {
+        /* 8-1, 4-5 */
+        float k1 = -B / C2;
+        float Xv = sqrt(-D / (A + B * k1 + C * k1 * k1));
+        if (Xv < 0)
+            Xv = -Xv;
+        float Yv = k1 * Xv;
+
+        /* 2-3 */
+        float k = -B / A2;
+        float Yh = sqrt(-D / (A * k * k + B * k + C));
+        if (Yh < 0)
+            Yh = -Yh;
+        float Xh = k * Yh;
+
+        /* 1-2 */
+        k = (A2 - B) / (C2 - B);
+        float Xr = sqrt(-D / (A + B * k + C * k * k));
+        float Yr = k * Xr;
+        if (Yr < k1 * Xr)
+            Yr = -Yr;
+
+        /* 3-4 */
+        k = (-A2 - B) / (C2 + B);
+        float Xl = sqrt(-D / (A + B * k + C * k * k));
+        float Yl = k * Xl;
+        if (Yl < k1 * Xl)
+            Xl = -Xl;
+
+        XV = round(Xv);
+        YV = round(Yv);
+        YR = round(Yr);
+        XH = round(Xh);
+        XL = round(Xl);
+    }
+
+    /* Init */
+    x = XV;
+    y = YV;
+    float initx = x - 0.5f;
+    float inity = y + 1;
+
+    float diffN = C2 * inity + B * initx + C;
+    float diffNW = diffN - A2 * initx - B * inity + A - B;
+    float midpoint = A * initx * initx + B * initx * inity + C * inity * inity + D;
+
+    float diffN_N = C2, diffNW_N = C2 - B, diffNW_NW = A2 - B2 + C2;
+    float diffW_W = A2, diffNW_W = A2 - B, diffSW_SW = A2 + B2 + C2;
+    float diffS_S = C2, diffSW_W = A2 + B, diffSW_S = C2 + B;
+
+    float cross1 = B - A, cross2 = A - B + C, cross3 = A + B + C, cross4 = A + B;
+
+    /* Region 1 */
+    while (y < YR) {
+        set_pixel(cx + x, cy + y, state.shd, state.col);
+        set_pixel(cx - x, cy - y, state.shd, state.col);
+        y++;
+
+        if (midpoint < 0 || (diffN - diffNW) < cross1) {
+            midpoint += diffN;
+            diffN += diffN_N;
+            diffNW += diffNW_N;
+        } else {
+            x--;
+            midpoint += diffNW;
+            diffN += diffNW_N;
+            diffNW += diffNW_NW;
+        }
+    }
+
+    /* Region 2 */
+    float diffW = diffNW - diffN + A + B + B_2;
+    diffNW += A - C;
+    midpoint += (diffW - diffN + C) / 2 + (A + C) / 4 - A;
+
+    while (x > XH) {
+        set_pixel(cx + x, cy + y, state.shd, state.col);
+        set_pixel(cx - x, cy - y, state.shd, state.col);
+        x--;
+
+        if (midpoint < 0 || (diffNW - diffW) < cross2) {
+            y++;
+            midpoint += diffNW;
+            diffW += diffNW_W;
+            diffNW += diffNW_NW;
+        } else {
+            midpoint += diffW;
+            diffW += diffW_W;
+            diffNW += diffNW_W;
+        }
+    }
+
+    /* Region 3 */
+    midpoint += diffW - diffNW + C2 - B;
+    diffW += B;
+    float diffSW = diffW - diffNW + diffW + C2 + C2 - B;
+
+    while (x > XL) {
+        set_pixel(cx + x, cy + y, state.shd, state.col);
+        set_pixel(cx - x, cy - y, state.shd, state.col);
+        x--;
+
+        if (midpoint < 0 || (diffSW - diffW) > cross3) {
+            midpoint += diffW;
+            diffW += diffW_W;
+            diffSW += diffSW_W;
+        } else {
+            y--;
+            midpoint += diffSW;
+            diffW += diffSW_W;
+            diffSW += diffSW_SW;
+        }
+    }
+
+    /* Region 4 */
+    float diffS = diffSW - diffW - B;
+    midpoint += diffS - diffSW / 2 + A - (A + C - B) / 4;
+    diffSW += C - A;
+    diffS += C - B_2;
+    YV = -YV;
+
+    while (y > YV) {
+        set_pixel(cx + x, cy + y, state.shd, state.col);
+        set_pixel(cx - x, cy - y, state.shd, state.col);
+        y--;
+
+        if (midpoint < 0 || (diffSW - diffS) < cross4) {
+            x--;
+            midpoint += diffSW;
+            diffS += diffSW_S;
+            diffSW += diffSW_SW;
+        } else {
+            midpoint += diffS;
+            diffS += diffS_S;
+            diffSW += diffSW_S;
+        }
     }
 }
 
