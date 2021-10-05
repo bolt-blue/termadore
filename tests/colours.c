@@ -4,13 +4,14 @@
 
 int init_colours()
 {
-    enum Shade line_shade = BLK;
+    shade(BLK);
     enum Colour c[16] = {Black, Red, Green, Yellow, Blue, Magenta, Cyan, White,
                          BBlack, BRed, BGreen, BYellow, BBlue, BMagenta, BCyan, BWhite};
     int width = get_width();
 
     for (int i = 0; i < 16; i++) {
-        draw_line(0, i, width, i, line_shade, c[i]);
+        colour(c[i]);
+        line(0, i, width, i);
     }
 
     return 0;
