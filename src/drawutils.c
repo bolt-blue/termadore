@@ -23,6 +23,7 @@ static struct Settings state = {
     .origin = {0, 0},		/* C99 */
     .rotate_angle = 0.0f,
     .scale_factor = 1.0f,
+    .mode = XY,
     .shd = BLK,
     .col = White,
 };
@@ -41,6 +42,11 @@ void translate(int x, int y)
 {
     state.origin.x = x;
     state.origin.y = y;
+}
+
+void mode(enum Rectmode mode)
+{
+    state.mode = mode;
 }
 
 void rotate(float angle)
@@ -145,9 +151,11 @@ void ellipse(int x, int y, int w, int h)
     float yf2 = yf * yf;
 
     /* Centre */
-    x += IS_EVEN(w) ? w / 2 : w / 2 + 1; /* TODO: why not round()? */
-    y -= IS_EVEN(h) ? h / 2 : h / 2 + 1;
-    rotate_point(&x, &y);
+    if (state.mode == XY) {
+        x += IS_EVEN(w) ? w / 2 : w / 2 + 1; /* TODO: why not round()? */
+        y -= IS_EVEN(h) ? h / 2 : h / 2 + 1;
+        rotate_point(&x, &y);
+    }
     int cx = state.origin.x + x;
     int cy = state.origin.y + y;
 

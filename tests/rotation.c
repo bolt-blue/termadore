@@ -39,9 +39,11 @@ int main(int argc, char **argv)
 	shade(LGT);
 	colour(Cyan);
 
+	mode(CENTRE);
 	scale(2.0f);
 	ellipse(0, 0, 5, 10);
 	scale(1 / 2.0f);
+	mode(XY);
 
 	/* Bottom left rects */
 	translate(w / 4, h - h / 4);
