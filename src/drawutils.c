@@ -52,12 +52,12 @@ void mode(enum Rectmode mode)
 void rotate(float angle)
 {
     if (angle >= 360.0f)	/* Wrap angle */
-	angle = fmod(angle, 360.0f);
+        angle = fmod(angle, 360.0f);
 
     state.rotate_angle += angle;
 
     if (state.rotate_angle >= 360.0f) /* Wrap theta */
-	state.rotate_angle -= 360.0f;
+        state.rotate_angle -= 360.0f;
 }
 
 void scale(float factor)
@@ -97,20 +97,20 @@ void line(int x1, int y1, int x2, int y2)
 
     while (1) {
         set_pixel(x1, y1, state.shd, state.col);
-	if (x1 == x2 && y1 == y2)
-	    break;
+        if (x1 == x2 && y1 == y2)
+            break;
 
-	error = 2 * dxy;
+        error = 2 * dxy;
 
-	if (error >= dy) {	/* error_xy + error_x > 0 */
-	    dxy += dy;
-	    x1 += step_x;
-	}
+        if (error >= dy) {	/* error_xy + error_x > 0 */
+            dxy += dy;
+            x1 += step_x;
+        }
 
-	if (error <= dx) {	/* error_xy + error_y < 0 */
-	    dxy += dx;
-	    y1 += step_y;
-	}
+        if (error <= dx) {	/* error_xy + error_y < 0 */
+            dxy += dx;
+            y1 += step_y;
+        }
     }
 }
 
