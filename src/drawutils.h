@@ -4,9 +4,30 @@
 
 #include "screen.h"
 
-// TODO: Remove superfluous `draw_` prefix
-void draw_line(int, int, int, int, enum Shade, enum Colour);
-void draw_rect(int, int, int, int, enum Shade, enum Shade, enum Colour, enum Colour);
-void draw_elipse(int, int, int, int, enum Shade, enum Shade, enum Colour, enum Colour);
+enum Rectmode {CENTRE, XY};
+
+struct Point {
+    int x;
+    int y;
+};
+
+struct Settings {
+    struct Point origin;
+    float rotate_angle;
+    float scale_factor;
+    enum Rectmode mode;
+    enum Shade shd;
+    enum Colour col;
+};
+
+void shade(enum Shade);
+void colour(enum Colour);
+void mode(enum Rectmode);
+void translate(int, int);
+void rotate(float);
+void scale(float);
+void line(int, int, int, int);
+void rect(int, int, int, int);
+void ellipse(int, int, int, int);
 
 #endif /* DRAWUTILS_H */
