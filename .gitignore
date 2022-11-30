@@ -1,9 +1,0 @@
-# Files without extension except Makefiles
-tests/*
-demos/*
-!tests/*.*
-!demos/*.*
-!Makefile*
-
-# Object files
-*.[oa]
